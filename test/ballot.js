@@ -8,6 +8,5 @@ contract('Ballot', accounts => {
     } catch (e) {
       assert.fail()
     }
-
   })
 })
