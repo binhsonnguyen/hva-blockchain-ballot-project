@@ -1,7 +1,7 @@
-pragma solidity 0.4.25;
+pragma solidity 0.4.24;
 
 
 contract Ballot {
-  constructor () {
+  constructor () public {
   }
 }
