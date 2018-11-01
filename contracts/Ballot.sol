@@ -2,16 +2,22 @@ pragma solidity 0.4.24;
 
 
 contract Ballot {
-  address private chairman;
+  address private _chairman;
 
   mapping (address => bool) private _voters;
 
   event Registered(address voter);
 
-  constructor () public {
+  modifier onlyChairman() {
+    require(msg.sender == _chairman);
+    _;
   }
 
-  function register(address voter) public {
+  constructor () public {
+    _chairman = msg.sender;
+  }
+
+  function register(address voter) public onlyChairman {
     _voters[voter] = false;
     emit Registered(voter);
   }
