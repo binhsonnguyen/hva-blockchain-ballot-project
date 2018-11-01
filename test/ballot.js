@@ -1,7 +1,13 @@
 const Ballot = artifacts.require('./Ballot.sol')
 
 contract('Ballot', accounts => {
+  const CHAIR = 0
+  const A_VOTER = 1
+  const AN_OTHER_VOTER = 2
+
   let contract
+
+  let register = to => ({by: by => contract.register(accounts[to], {from: accounts[by]})})
 
   beforeEach(async () => {
     contract = await Ballot.deployed()
@@ -9,7 +15,7 @@ contract('Ballot', accounts => {
 
   it('...should let chairman registering a voter', async () => {
     try {
-      await register(accounts[1]).by(accounts[0])
+      await register(A_VOTER).by(CHAIR)
       assert.ok('voter has been registered successfully')
     } catch (e) {
       console.log(e)
@@ -19,19 +25,11 @@ contract('Ballot', accounts => {
 
   it('...should reject registering request from otherman', async () => {
     try {
-      await register(accounts[2]).by(accounts[1])
+      await register(A_VOTER).by(AN_OTHER_VOTER)
     } catch (e) {
       assert.ok(e, 'registering request has been rejected')
       return
     }
     assert.fail()
   })
-
-  function register (to) {
-    return {
-      by: function (by) {
-        return contract.register(to, {from: by})
-      }
-    }
-  }
 })
