@@ -13,6 +13,11 @@ contract Ballot {
     _;
   }
 
+  modifier neverVoted(address voter) {
+    require(!_voters[voter]);
+    _;
+  }
+
   constructor () public {
     _chairman = msg.sender;
   }
@@ -22,7 +27,7 @@ contract Ballot {
     emit Registered(voter);
   }
 
-  function vote(uint proposal) public {
-
+  function vote(uint proposal) public neverVoted(msg.sender) {
+    _voters[msg.sender] = true;
   }
 }
