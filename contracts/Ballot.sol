@@ -21,4 +21,8 @@ contract Ballot {
     _voters[voter] = false;
     emit Registered(voter);
   }
+
+  function vote(uint proposal) public {
+
+  }
 }
