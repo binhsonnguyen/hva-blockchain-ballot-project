@@ -1,1 +1,0 @@
-module.exports = (contract, accounts) => proposal => ({by: by => contract.vote(proposal, {from: accounts[by]})})
