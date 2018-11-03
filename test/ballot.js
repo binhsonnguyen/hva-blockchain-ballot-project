@@ -2,6 +2,7 @@ const Ballot = artifacts.require('./SeekableBallot.sol')
 const Register = require('./register.js')
 const Vote = require('./vote.js')
 const TimeTraveller = require('./time-traveller')
+const attempt = require('./attempt.js')
 
 const log = console.log
 
@@ -28,42 +29,30 @@ contract('ballot/registering', accounts => {
   })
 
   it('...should let chairman attempt registering', async () => {
-    try {
+    attempt(async () => {
       await register(A_VOTER).by(CHAIR)
-    } catch (e) {
-      assert.fail()
-      return
-    }
+    })
+      .should.be.succeed()
   })
 
   it('...should let chairman attempt registering in time', async () => {
-    try {
+    attempt(async () => {
       await travelTime(2 * SECOND)
       await register(A_VOTER).by(CHAIR)
-    } catch (e) {
-      assert.fail()
-    }
+    }).should.be.succeed()
   })
 
   it('...should reject others registering', async () => {
-    try {
-        await register(A_VOTER).by(AN_OTHER_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    attempt(async () => {
+      await register(A_VOTER).by(AN_OTHER_VOTER)
+    }).should.be.rejected()
   })
 
   it('...should reject voter do vote in early time', async () => {
-    try {
+    attempt(async () => {
       await register(A_VOTER).by(CHAIR)
       await vote(A_PROPOSAL).by(A_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 })
 
@@ -75,48 +64,32 @@ contract('ballot/voting', accounts => {
 
   beforeEach(async () => {
     contract = await Ballot.new(accounts[CHAIR])
-    // contract = await Ballot.deployed()
     register = Register(contract, accounts)
     vote = Vote(contract, accounts)
     travelTime = TimeTraveller(contract)
   })
 
   it('should reject registering when time over', async () => {
-    try {
+    attempt(async () => {
       await travelTime(REGISTER_DURATION + 1)
       await register(A_VOTER).by(CHAIR)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 
   it('...should let registered voter do vote when in time', async () => {
-    try {
+    attempt(async () => {
       await register(AN_OTHER_VOTER).by(CHAIR)
-      // await travelTime(REGISTER_DURATION + 1)
-      // await vote(A_PROPOSAL).by(A_VOTER)
-      // assert.ok(true)
-    } catch (e) {
-      log(e.toString())
-      e.toString()
-      for (p in e) log('---p', p)
-      // for (p of e) log('---p', p)
-      assert.fail()
-    }
+      await travelTime(REGISTER_DURATION + 1)
+      await vote(A_PROPOSAL).by(A_VOTER)
+    }).should.be.succeed()
   })
 
   it('...should reject re-vote', async () => {
-    try {
+    attempt(async () => {
       await register(A_VOTER).by(CHAIR)
       await travelTime(REGISTER_DURATION + 1)
       await vote(A_PROPOSAL).by(A_VOTER)
       await vote(ANOTHER_PROPOSAL).by(A_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 })
