@@ -22,7 +22,7 @@ contract Ballot {
     _chairman = msg.sender;
   }
 
-  function register(address voter) public onlyChairman {
+  function register(address voter) public onlyChairman neverVoted(voter) {
     _voters[voter] = false;
     emit Registered(voter);
   }

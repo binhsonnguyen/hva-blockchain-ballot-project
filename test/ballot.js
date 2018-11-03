@@ -9,6 +9,7 @@ contract('Ballot', accounts => {
 
   let contract = null
 
+  let log = (...msg) => console.log(msg)
   let register = to => ({by: by => contract.register(accounts[to], {from: accounts[by]})})
   let vote = proposal => ({by: by => contract.vote(proposal, {from: accounts[by]})})
 
@@ -52,6 +53,18 @@ contract('Ballot', accounts => {
       await register(A_VOTER).by(CHAIR)
       await vote(A_PROPOSAL).by(A_VOTER)
       await vote(ANOTHER_PROPOSAL).by(A_VOTER)
+    } catch (e) {
+      assert.ok(true)
+      return
+    }
+    assert.fail()
+  })
+
+  it('...should reject chairman register a voted voter', async () => {
+    try {
+      await register(A_VOTER).by(CHAIR)
+      await vote(A_PROPOSAL).by(A_VOTER)
+      await register(A_VOTER).by(CHAIR)
     } catch (e) {
       assert.ok(true)
       return
