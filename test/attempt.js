@@ -2,7 +2,7 @@ module.exports = asyncAction => ({
   should: {
     rejected: async () => {
       try {
-        await asyncAction()
+        await asyncAction
       } catch (e) {
         assert.ok(true)
         return
@@ -14,7 +14,7 @@ module.exports = asyncAction => ({
         await asyncAction()
         assert.ok(true)
       } catch (e) {
-        log(e)
+        console.log("hei", e)
         assert.fail()
       }
     }

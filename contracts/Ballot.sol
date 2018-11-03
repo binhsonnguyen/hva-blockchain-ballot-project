@@ -4,7 +4,7 @@ pragma solidity 0.4.24;
 contract Ballot {
   address private _chairman;
 
-  mapping (address => bool) private _voters;
+  mapping(address => bool) private _voters;
 
   event Registered(address voter);
 

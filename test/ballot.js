@@ -7,6 +7,9 @@ const AN_OTHER_VOTER = 2
 const A_PROPOSAL = 0
 const ANOTHER_PROPOSAL = 0
 
+const SECOND = 1000
+const REGISTER_DURATION = 5 * SECOND
+
 contract('ballot/registering', accounts => {
   let contract = null
   let clock = null
@@ -34,7 +37,7 @@ contract('ballot/registering', accounts => {
 
   it('...should let chairman attempt registering in time', async () => {
     try {
-      clock.tick(2000)
+      clock.tick(2* SECOND)
       await register(A_VOTER).by(CHAIR)
     } catch (e) {
       assert.fail()
@@ -72,7 +75,7 @@ contract('ballot/voting', accounts => {
   let vote = proposal => ({by: by => contract.vote(proposal, {from: accounts[by]})})
 
   beforeEach(async function () {
-    this.timeout(4000) // increase mocha unit test's timeout limit
+    this.timeout(10 * SECOND) // increase mocha unit test's timeout limit
     contract = await BallotRegistering.deployed()
     clock = sinon.useFakeTimers()
   })
@@ -83,7 +86,7 @@ contract('ballot/voting', accounts => {
 
   it('should reject registering when time over', async () => {
     try {
-      clock.tick(5000)
+      clock.tick(REGISTER_DURATION)
       await register(A_VOTER).by(CHAIR)
     } catch (e) {
       assert.ok(true)
@@ -95,7 +98,7 @@ contract('ballot/voting', accounts => {
   it('...should let registered voter do vote when in time', async () => {
     try {
       await register(A_VOTER).by(CHAIR)
-      clock.tick(5000)
+      clock.tick(REGISTER_DURATION)
       await vote(A_PROPOSAL).by(A_VOTER)
       assert.ok(true)
     } catch (e) {
@@ -106,7 +109,7 @@ contract('ballot/voting', accounts => {
   it('...should reject re-vote', async () => {
     try {
       await register(A_VOTER).by(CHAIR)
-      clock.tick(5000)
+      clock.tick(REGISTER_DURATION)
       await vote(A_PROPOSAL).by(A_VOTER)
       await vote(ANOTHER_PROPOSAL).by(A_VOTER)
     } catch (e) {
