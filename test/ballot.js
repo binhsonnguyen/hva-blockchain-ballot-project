@@ -12,63 +12,64 @@ contract('Ballot', accounts => {
   let log = (...msg) => console.log(msg)
   let register = to => ({by: by => contract.register(accounts[to], {from: accounts[by]})})
   let vote = proposal => ({by: by => contract.vote(proposal, {from: accounts[by]})})
+  let given = asyncAction => ({
+    reject: {
+      orFailed: async () => {
+        try {
+          await asyncAction()
+        } catch (e) {
+          assert.ok(true)
+          return
+        }
+        assert.fail()
+      }
+    },
+    orFailed: async () => {
+      try {
+        await asyncAction()
+        assert.ok(true)
+      } catch (e) {
+        log(e)
+        assert.fail()
+      }
+    }
+  })
 
   beforeEach(async () => {
     contract = await Ballot.deployed()
   })
 
   it('...should let chairman registering a voter', async () => {
-    try {
-      await register(A_VOTER).by(CHAIR)
-      assert.ok(true)
-    } catch (e) {
-      console.log(e)
-      assert.fail()
-    }
+    given(async () => await register(A_VOTER).by(CHAIR)).orFailed()
   })
 
   it('...should reject registering request from otherman', async () => {
-    try {
-      await register(A_VOTER).by(AN_OTHER_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    given(async () => await register(A_VOTER).by(AN_OTHER_VOTER))
+      .reject.orFailed()
   })
 
   it('...should let registered voter do vote', async () => {
-    try {
+    given(async () => {
       await register(A_VOTER).by(CHAIR)
       await vote(A_PROPOSAL).by(A_VOTER)
-      assert.ok(true)
-    } catch (e) {
-      console.log(e)
-      assert.fail()
-    }
+    }).orFailed()
   })
 
   it('...should reject voted voter do vote again', async () => {
-    try {
+    given(async () => {
       await register(A_VOTER).by(CHAIR)
       await vote(A_PROPOSAL).by(A_VOTER)
       await vote(ANOTHER_PROPOSAL).by(A_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    })
+      .reject.orFailed()
   })
 
   it('...should reject chairman register a voted voter', async () => {
-    try {
+    given(async () => {
       await register(A_VOTER).by(CHAIR)
       await vote(A_PROPOSAL).by(A_VOTER)
       await register(A_VOTER).by(CHAIR)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    })
+      .reject.orFailed()
   })
 })
