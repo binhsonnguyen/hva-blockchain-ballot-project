@@ -1,0 +1,1 @@
+module.exports = (contract, accounts) => to => ({by: by => contract.register(accounts[to], {from: accounts[by]})})

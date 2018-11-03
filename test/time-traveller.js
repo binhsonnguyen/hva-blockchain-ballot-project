@@ -1,0 +1,1 @@
+module.exports = contract => seconds => contract.travelTime(seconds)

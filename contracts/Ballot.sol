@@ -3,6 +3,8 @@ pragma solidity 0.4.24;
 
 contract Ballot {
   address private _chairman;
+  uint public startTime;
+  uint public registerDeadline;
 
   mapping(address => bool) private _voters;
 
@@ -18,16 +20,28 @@ contract Ballot {
     _;
   }
 
-  constructor () public {
-    _chairman = msg.sender;
+  modifier inRegTime() {
+    require(now <= registerDeadline);
+    _;
   }
 
-  function register(address voter) public onlyChairman neverVoted(voter) {
+  modifier inVoteTime() {
+    require(registerDeadline < now);
+    _;
+  }
+
+  constructor () public {
+    _chairman = msg.sender;
+    startTime = now;
+    registerDeadline = now + 5 seconds;
+  }
+
+  function register(address voter) public onlyChairman inRegTime neverVoted(voter) {
     _voters[voter] = false;
     emit Registered(voter);
   }
 
-  function vote(uint proposal) public neverVoted(msg.sender) {
+  function vote(uint proposal) public inVoteTime neverVoted(msg.sender) {
     _voters[msg.sender] = true;
   }
 }
