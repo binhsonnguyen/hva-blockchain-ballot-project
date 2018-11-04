@@ -15,7 +15,6 @@ module.exports = asyncAction => ({
           await asyncAction()
           assert.ok(true)
         } catch (e) {
-          console.log('hei', e)
           assert.fail()
         }
       }
