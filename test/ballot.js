@@ -31,53 +31,37 @@ contract('ballot/registering', accounts => {
   })
 
   it('...should let chairman attempt registering', async () => {
-    try {
+    await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
-    } catch (e) {
-      assert.fail()
-    }
+    }).should.be.succeed()
   })
 
   it('...should let chairman attempt registering in time', async () => {
-    try {
+    await attempt(async () => {
       await travelTime(REGISTER_DURATION)
       await register(A_VOTER).by(CHAIR)
-    } catch (e) {
-      assert.fail()
-    }
+    }).should.be.succeed()
   })
 
   it('...should reject others registering', async () => {
-    try {
+    await attempt(async () => {
       await register(A_VOTER).by(AN_OTHER_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 
   it('...should reject voter do vote in early time', async () => {
-    try {
+    await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
       await vote(A_PROPOSAL).by(A_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 
-  it('...should reject voter do vote in early time 2', async () => {
-    try {
+  it('...should reject voter do vote in early time', async () => {
+    await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
       await travelTime(REGISTER_DURATION)
       await vote(A_PROPOSAL).by(A_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 })
 
@@ -99,36 +83,26 @@ contract('ballot/voting', accounts => {
   })
 
   it('should reject registering when time over', async () => {
-    try {
+    await attempt(async () => {
       await travelTime(REGISTER_DURATION + A_LITTLE_BIT_TIME)
       await register(A_VOTER).by(CHAIR)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 
   it('...should let registered voter do vote when in time', async () => {
-    try {
+    await attempt(async () => {
       await register(AN_OTHER_VOTER).by(CHAIR)
       await travelTime(REGISTER_DURATION + A_LITTLE_BIT_TIME)
       await vote(A_PROPOSAL).by(A_VOTER)
-    } catch (e) {
-      assert.fail()
-    }
+    }).should.be.succeed()
   })
 
   it('...should reject re-vote', async () => {
-    try {
+    await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
       await travelTime(REGISTER_DURATION + A_LITTLE_BIT_TIME)
       await vote(A_PROPOSAL).by(A_VOTER)
       await vote(ANOTHER_PROPOSAL).by(A_VOTER)
-    } catch (e) {
-      assert.ok(true)
-      return
-    }
-    assert.fail()
+    }).should.be.rejected()
   })
 })
