@@ -10,9 +10,12 @@ const log = console.log
 const A_PROPOSAL = 0
 const ANOTHER_PROPOSAL = 1
 const SECOND = 1
-const REGISTER_DURATION = 5 * SECOND
-const VOTING_DURATION = 5 * SECOND
 const A_LITTLE_BIT_TIME = 1 * SECOND
+const REGISTER_DURATION = 5 * SECOND
+const TO_VOTING_TIME = REGISTER_DURATION + A_LITTLE_BIT_TIME
+const VOTING_DURATION = 5 * SECOND
+const TO_FINISHED_TIME = REGISTER_DURATION + VOTING_DURATION + A_LITTLE_BIT_TIME
+
 
 contract('ballot/registering', accounts => {
   const CHAIR = accounts[0]
@@ -85,7 +88,7 @@ contract('ballot/voting', accounts => {
 
   it('should reject registering when time over', async () => {
     await attempt(async () => {
-      await travelTime(REGISTER_DURATION + A_LITTLE_BIT_TIME)
+      await travelTime(TO_VOTING_TIME)
       await register(A_VOTER).by(CHAIR)
     }).should.be.rejected()
   })
@@ -93,7 +96,7 @@ contract('ballot/voting', accounts => {
   it('...should let registered voter do vote when in time', async () => {
     await attempt(async () => {
       await register(AN_OTHER_VOTER).by(CHAIR)
-      await travelTime(REGISTER_DURATION + A_LITTLE_BIT_TIME)
+      await travelTime(TO_VOTING_TIME)
       await vote(A_PROPOSAL).by(A_VOTER)
     }).should.be.succeed()
   })
@@ -101,7 +104,7 @@ contract('ballot/voting', accounts => {
   it('...should reject re-vote', async () => {
     await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
-      await travelTime(REGISTER_DURATION + A_LITTLE_BIT_TIME)
+      await travelTime(TO_VOTING_TIME)
       await vote(A_PROPOSAL).by(A_VOTER)
       await vote(ANOTHER_PROPOSAL).by(A_VOTER)
     }).should.be.rejected()
@@ -128,7 +131,7 @@ contract('ballot/done', accounts => {
   it('...should reject voting when time overed', async () => {
     await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
-      await travelTime(REGISTER_DURATION + VOTING_DURATION + A_LITTLE_BIT_TIME)
+      await travelTime(TO_FINISHED_TIME)
       await vote(A_PROPOSAL).by(A_VOTER)
     }).should.be.rejected()
   })
