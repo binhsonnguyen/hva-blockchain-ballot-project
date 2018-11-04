@@ -11,6 +11,7 @@ const A_PROPOSAL = 0
 const ANOTHER_PROPOSAL = 1
 const SECOND = 1
 const REGISTER_DURATION = 5 * SECOND
+const VOTING_DURATION = 5 * SECOND
 const A_LITTLE_BIT_TIME = 1 * SECOND
 
 contract('ballot/registering', accounts => {
@@ -103,6 +104,32 @@ contract('ballot/voting', accounts => {
       await travelTime(REGISTER_DURATION + A_LITTLE_BIT_TIME)
       await vote(A_PROPOSAL).by(A_VOTER)
       await vote(ANOTHER_PROPOSAL).by(A_VOTER)
+    }).should.be.rejected()
+  })
+})
+
+contract('ballot/done', accounts => {
+  const CHAIR = accounts[0]
+  const A_VOTER = accounts[1]
+  const AN_OTHER_VOTER = accounts[2]
+
+  let contract = null
+  let register = null
+  let vote = null
+  let travelTime = null
+
+  beforeEach(async () => {
+    contract = await Ballot.new(accounts[CHAIR])
+    register = Register(contract, accounts)
+    vote = Vote(contract, accounts)
+    travelTime = TimeTraveller(contract)
+  })
+
+  it('...should reject voting when time overed', async () => {
+    await attempt(async () => {
+      await register(A_VOTER).by(CHAIR)
+      await travelTime(REGISTER_DURATION + VOTING_DURATION + A_LITTLE_BIT_TIME)
+      await vote(A_PROPOSAL).by(A_VOTER)
     }).should.be.rejected()
   })
 })
