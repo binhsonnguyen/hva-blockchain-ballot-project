@@ -22,12 +22,10 @@ contract Ballot {
   }
 
   modifier inRegTime() {
-    require(now <= registerDeadline);
     _;
   }
 
   modifier inVoteTime() {
-    require(registerDeadline < now && now <= votingDeadline);
     _;
   }
 
