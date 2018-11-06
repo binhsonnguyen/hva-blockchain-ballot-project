@@ -2,20 +2,11 @@ const Ballot = artifacts.require('./BallotWithTimeTravelAbility.sol')
 
 const Register = require('./libs/register.js')
 const Vote = require('./libs/vote.js')
-const TimeTraveller = require('./libs/time-traveller')
-const attempt = require('./libs/attempt.js')
 
 const log = console.log
 
 const A_PROPOSAL = 0
 const ANOTHER_PROPOSAL = 1
-const SECOND = 1
-const A_LITTLE_BIT_TIME = 1 * SECOND
-const REGISTER_DURATION = 5 * SECOND
-const TO_VOTING_TIME = REGISTER_DURATION + A_LITTLE_BIT_TIME
-const VOTING_DURATION = 5 * SECOND
-const TO_FINISHED_TIME = REGISTER_DURATION + VOTING_DURATION + A_LITTLE_BIT_TIME
-
 
 contract('ballot/registering', accounts => {
   const CHAIR = accounts[0]
@@ -25,7 +16,6 @@ contract('ballot/registering', accounts => {
   let contract = null
   let register = null
   let vote = null
-  let travelTime = null
 
   beforeEach(async () => {
     contract = await Ballot.new(accounts[CHAIR])
