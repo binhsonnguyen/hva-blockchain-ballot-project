@@ -3,11 +3,16 @@ pragma solidity 0.4.24;
 
 contract Ballot {
   address private _chairman;
-  uint public startTime;
-  uint public registerDeadline;
-  uint public votingDeadline;
+
+  enum Stage {
+    Preparing,
+    Registering,
+    Voting,
+    Finished
+  }
 
   mapping(address => bool) private _voters;
+  Stage private _stage;
 
   event Registered(address voter);
 
