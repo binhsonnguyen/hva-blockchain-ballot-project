@@ -1,6 +1,8 @@
 DApp cho việc bầu cử
 ===
 
+[![Build Status](https://travis-ci.org/binhsonnguyen/hva-blockchain-ballot-project.svg?branch=master)](https://travis-ci.org/binhsonnguyen/hva-blockchain-ballot-project)
+
 Missions
 ---
 

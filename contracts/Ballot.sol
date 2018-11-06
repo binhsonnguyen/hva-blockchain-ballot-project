@@ -45,9 +45,24 @@ contract OwnedByChairman {
 
 
 contract Ballot is Stageable, OwnedByChairman {
+  struct Proposal {
+    bool registered;
+    uint vote;
+    bytes32 name;
+  }
+
   mapping(address => bool) private _voters;
 
+  Proposal[] public proposals;
+
   event Registered(address voter);
+
+  modifier notRegistered(bytes32 name) {
+    for (uint i = 0; i < proposals.length; i++) {
+      if (proposals[i].name == name) revert();
+    }
+    _;
+  }
 
   modifier neverVoted(address voter) {
     require(!_voters[voter]);
@@ -57,6 +72,11 @@ contract Ballot is Stageable, OwnedByChairman {
   constructor () public {
     _chairman = msg.sender;
     _stage = Stage.Preparing;
+  }
+
+  function addProposal(bytes32 name) public onlyChairman inPreparingTime notRegistered(name) {
+    proposals[proposals.length].name = name;
+    proposals[proposals.length].registered = true;
   }
 
   function register(address voter) public onlyChairman inRegisteringTime neverVoted(voter) {

@@ -35,4 +35,10 @@ contract('ballot/preparing', accounts => {
       await register(A_VOTER).by(AN_OTHER_VOTER)
     }).should.be.rejected()
   })
+
+  it('...should let chairman add proposals', async () => {
+    await attempt(async () => {
+      await register(A_VOTER).by(AN_OTHER_VOTER)
+    }).should.be.rejected()
+  })
 })
