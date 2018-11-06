@@ -5,6 +5,7 @@ contract Ballot {
   address private _chairman;
   uint public startTime;
   uint public registerDeadline;
+  uint public votingDeadline;
 
   mapping(address => bool) private _voters;
 
@@ -26,7 +27,7 @@ contract Ballot {
   }
 
   modifier inVoteTime() {
-    require(registerDeadline < now);
+    require(registerDeadline < now && now <= votingDeadline);
     _;
   }
 
@@ -34,6 +35,7 @@ contract Ballot {
     _chairman = msg.sender;
     startTime = now;
     registerDeadline = now + 5 seconds;
+    votingDeadline = now + 10 seconds;
   }
 
   function register(address voter) public onlyChairman inRegTime neverVoted(voter) {
