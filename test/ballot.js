@@ -1,7 +1,8 @@
-const Ballot = artifacts.require('./BallotWithTimeTravelAbility.sol')
+const Ballot = artifacts.require('./Ballot.sol')
 
 const Register = require('./libs/register.js')
 const Vote = require('./libs/vote.js')
+const attempt = require('./libs/attempt.js')
 
 const log = console.log
 
@@ -18,21 +19,13 @@ contract('ballot/registering', accounts => {
   let vote = null
 
   beforeEach(async () => {
-    contract = await Ballot.new(accounts[CHAIR])
+    contract = await Ballot.new()
     register = Register(contract)
     vote = Vote(contract)
-    travelTime = TimeTraveller(contract)
   })
 
   it('...should let chairman attempt registering', async () => {
     await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-    }).should.be.succeed()
-  })
-
-  it('...should let chairman attempt registering in time', async () => {
-    await attempt(async () => {
-      await travelTime(REGISTER_DURATION)
       await register(A_VOTER).by(CHAIR)
     }).should.be.succeed()
   })
@@ -46,82 +39,6 @@ contract('ballot/registering', accounts => {
   it('...should reject voter do vote in early time', async () => {
     await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
-      await vote(A_PROPOSAL).by(A_VOTER)
-    }).should.be.rejected()
-  })
-
-  it('...should reject voter do vote in early time', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-      await travelTime(REGISTER_DURATION)
-      await vote(A_PROPOSAL).by(A_VOTER)
-    }).should.be.rejected()
-  })
-})
-
-contract('ballot/voting', accounts => {
-  const CHAIR = accounts[0]
-  const A_VOTER = accounts[1]
-  const AN_OTHER_VOTER = accounts[2]
-
-  let contract = null
-  let register = null
-  let vote = null
-  let travelTime = null
-
-  beforeEach(async () => {
-    contract = await Ballot.new(accounts[CHAIR])
-    register = Register(contract, accounts)
-    vote = Vote(contract, accounts)
-    travelTime = TimeTraveller(contract)
-  })
-
-  it('should reject registering when time over', async () => {
-    await attempt(async () => {
-      await travelTime(TO_VOTING_TIME)
-      await register(A_VOTER).by(CHAIR)
-    }).should.be.rejected()
-  })
-
-  it('...should let registered voter do vote when in time', async () => {
-    await attempt(async () => {
-      await register(AN_OTHER_VOTER).by(CHAIR)
-      await travelTime(TO_VOTING_TIME)
-      await vote(A_PROPOSAL).by(A_VOTER)
-    }).should.be.succeed()
-  })
-
-  it('...should reject re-vote', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-      await travelTime(TO_VOTING_TIME)
-      await vote(A_PROPOSAL).by(A_VOTER)
-      await vote(ANOTHER_PROPOSAL).by(A_VOTER)
-    }).should.be.rejected()
-  })
-})
-
-contract('ballot/done', accounts => {
-  const CHAIR = accounts[0]
-  const A_VOTER = accounts[1]
-  const AN_OTHER_VOTER = accounts[2]
-
-  let contract = null
-  let register = null
-  let vote = null
-  let travelTime = null
-
-  beforeEach(async () => {
-    contract = await Ballot.new(accounts[CHAIR])
-    register = Register(contract, accounts)
-    vote = Vote(contract, accounts)
-    travelTime = TimeTraveller(contract)
-  })
-
-  it('...should reject voting when time overed', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-      await travelTime(TO_FINISHED_TIME)
       await vote(A_PROPOSAL).by(A_VOTER)
     }).should.be.rejected()
   })
