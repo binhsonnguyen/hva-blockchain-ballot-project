@@ -59,7 +59,7 @@ contract Ballot is Stageable, OwnedByChairman {
     _stage = Stage.Preparing;
   }
 
-  function register(address voter) public onlyChairman inRegTime neverVoted(voter) {
+  function register(address voter) public onlyChairman inRegisteringTime neverVoted(voter) {
     _voters[voter] = false;
     emit Registered(voter);
   }
