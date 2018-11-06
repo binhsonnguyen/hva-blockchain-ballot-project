@@ -1,9 +1,7 @@
 pragma solidity 0.4.24;
 
 
-contract Ballot {
-  address private _chairman;
-
+contract Stageable {
   enum Stage {
     Preparing,
     Registering,
@@ -11,42 +9,58 @@ contract Ballot {
     Finished
   }
 
-  mapping(address => bool) private _voters;
-  Stage private _stage;
+  Stage internal _stage;
 
-  event Registered(address voter);
+  modifier inPreparingTime() {
+    require(_stage == Stage.Preparing);
+    _;
+  }
+
+  modifier inRegisteringTime() {
+    require(_stage == Stage.Registering);
+    _;
+  }
+
+  modifier inVoteTime() {
+    require(_stage == Stage.Voting);
+    _;
+  }
+
+  modifier finished() {
+    require(_stage == Stage.Finished);
+    _;
+  }
+
+}
+
+
+contract OwnedByChairman {
+  address internal _chairman;
 
   modifier onlyChairman() {
     require(msg.sender == _chairman);
     _;
   }
+}
+
+
+contract Ballot is Stageable, OwnedByChairman {
+  mapping(address => bool) private _voters;
+
+  event Registered(address voter);
 
   modifier neverVoted(address voter) {
     require(!_voters[voter]);
     _;
   }
 
-  modifier inRegTime() {
-    _;
-  }
-
-  modifier inVoteTime() {
-    _;
-  }
-
   constructor () public {
     _chairman = msg.sender;
-    startTime = now;
-    registerDeadline = now + 5 seconds;
-    votingDeadline = now + 10 seconds;
+    _stage = Stage.Preparing;
   }
 
   function register(address voter) public onlyChairman inRegTime neverVoted(voter) {
     _voters[voter] = false;
     emit Registered(voter);
-  }
-
-  function vote(uint proposal) public inVoteTime neverVoted(msg.sender) {
-    _voters[msg.sender] = true;
   }
 }
