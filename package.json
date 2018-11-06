@@ -1,0 +1,27 @@
+{
+  "name": "ballot",
+  "version": "1.0.0",
+  "description": "DApp cho việc bầu cử",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "truffle-hdwallet-provider": "^0.0.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binhsonnguyen/hva-blockchain-ballot-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/binhsonnguyen/hva-blockchain-ballot-project/issues"
+  },
+  "homepage": "https://github.com/binhsonnguyen/hva-blockchain-ballot-project#readme"
+}
