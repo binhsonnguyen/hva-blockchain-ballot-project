@@ -9,7 +9,7 @@ const log = console.log
 const A_PROPOSAL = 0
 const ANOTHER_PROPOSAL = 1
 
-contract('ballot/registering', accounts => {
+contract('ballot/preparing', accounts => {
   const CHAIR = accounts[0]
   const A_VOTER = accounts[1]
   const AN_OTHER_VOTER = accounts[2]
@@ -24,22 +24,15 @@ contract('ballot/registering', accounts => {
     vote = Vote(contract)
   })
 
-  it('...should let chairman attempt registering', async () => {
+  it('...should reject chairman attempt registering', async () => {
     await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
-    }).should.be.succeed()
+    }).should.be.rejected()
   })
 
   it('...should reject others registering', async () => {
     await attempt(async () => {
       await register(A_VOTER).by(AN_OTHER_VOTER)
-    }).should.be.rejected()
-  })
-
-  it('...should reject voter do vote in early time', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-      await vote(A_PROPOSAL).by(A_VOTER)
     }).should.be.rejected()
   })
 })
