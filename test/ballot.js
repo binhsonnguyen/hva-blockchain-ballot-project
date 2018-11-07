@@ -52,4 +52,16 @@ contract('ballot/preparing', accounts => {
     let actual = Number(await contract.proposalsCount.call())
     assert.strictEqual(actual, expected)
   })
+
+  it('...should let people get proposals name', async () => {
+    await nominate(A_PROPOSAL).by(CHAIR)
+    let expected = web3.fromUtf8(A_PROPOSAL)
+    let result = await contract.proposals.call(0)
+    assert.ok(result.startsWith(expected))
+
+    await nominate(ANOTHER_PROPOSAL).by(CHAIR)
+    let anOtherExpected = web3.fromUtf8(ANOTHER_PROPOSAL)
+    let anOtherResult = await contract.proposals.call(1)
+    assert.ok(anOtherResult.startsWith(anOtherExpected))
+  })
 })
