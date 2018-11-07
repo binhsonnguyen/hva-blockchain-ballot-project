@@ -80,6 +80,10 @@ contract Ballot is Stageable, OwnedByChairman {
     emit Nominated(proposal);
   }
 
+  function proposalsCount () public view returns(uint) {
+    return proposals.length;
+  }
+
   function register(address voter) public onlyChairman inRegisteringTime neverVoted(voter) {
     _voters[voter] = false;
     emit Registered(voter);

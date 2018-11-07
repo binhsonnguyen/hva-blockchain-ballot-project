@@ -7,8 +7,8 @@ const attempt = require('./libs/attempt.js')
 
 const log = console.log
 
-const A_PROPOSAL = "WINNER"
-const ANOTHER_PROPOSAL = "LOSSER"
+const A_PROPOSAL = 'WINNER' // 0x57494e4e4552
+const ANOTHER_PROPOSAL = 'LOSSER' // 0x4c4f53534552
 
 contract('ballot/preparing', accounts => {
   const CHAIR = accounts[0]
@@ -43,5 +43,13 @@ contract('ballot/preparing', accounts => {
     await attempt(async () => {
       await nominate(A_PROPOSAL).by(CHAIR)
     }).should.be.succeed()
+  })
+
+  it('...should let people get proposals count', async () => {
+    await nominate(A_PROPOSAL).by(CHAIR)
+    await nominate(ANOTHER_PROPOSAL).by(CHAIR)
+    let expected = 2
+    let actual = Number(await contract.proposalsCount.call())
+    assert.strictEqual(actual, expected)
   })
 })
