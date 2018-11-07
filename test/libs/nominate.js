@@ -1,0 +1,1 @@
+module.exports = contract => proposal => ({by: by => contract.nominate(web3.fromUtf8(proposal), {from: by})})

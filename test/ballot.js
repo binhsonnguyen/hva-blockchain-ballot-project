@@ -2,12 +2,13 @@ const Ballot = artifacts.require('./Ballot.sol')
 
 const Register = require('./libs/register.js')
 const Vote = require('./libs/vote.js')
+const Nominate = require('./libs/nominate.js')
 const attempt = require('./libs/attempt.js')
 
 const log = console.log
 
-const A_PROPOSAL = 0
-const ANOTHER_PROPOSAL = 1
+const A_PROPOSAL = "WINNER"
+const ANOTHER_PROPOSAL = "LOSSER"
 
 contract('ballot/preparing', accounts => {
   const CHAIR = accounts[0]
@@ -16,11 +17,13 @@ contract('ballot/preparing', accounts => {
 
   let contract = null
   let register = null
+  let nominate = null
   let vote = null
 
   beforeEach(async () => {
     contract = await Ballot.new()
     register = Register(contract)
+    nominate = Nominate(contract)
     vote = Vote(contract)
   })
 
@@ -38,7 +41,7 @@ contract('ballot/preparing', accounts => {
 
   it('...should let chairman add proposals', async () => {
     await attempt(async () => {
-      await register(A_VOTER).by(AN_OTHER_VOTER)
-    }).should.be.rejected()
+      await nominate(A_PROPOSAL).by(CHAIR)
+    }).should.be.succeed()
   })
 })
