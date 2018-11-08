@@ -103,3 +103,35 @@ contract('ballot/preparing', accounts => {
     }).should.be.rejected()
   })
 })
+
+contract('ballot/started', accounts => {
+  const CHAIR = accounts[0]
+  const A_VOTER = accounts[1]
+  const AN_OTHER_VOTER = accounts[2]
+  const NOT_REGISTERED = accounts[3]
+
+  let contract = null
+  let nominate = null
+  let register = null
+  let start = null
+  let vote = null
+
+  beforeEach(async () => {
+    contract = await Ballot.new()
+    nominate = Nominate(contract)
+    register = Register(contract)
+    start = Start(contract)
+    vote = Vote(contract)
+    await nominate(A_PROPOSAL).by(CHAIR)
+    await nominate(ANOTHER_PROPOSAL).by(CHAIR)
+    await register(A_VOTER).by(CHAIR)
+    await register(AN_OTHER_VOTER).by(CHAIR)
+    await contract.start()
+  })
+
+  it('...should let registered voter do vote', async () => {
+    attempt(async () => {
+      await vote(0).by(A_VOTER)
+    }).should.be.succeed()
+  })
+})

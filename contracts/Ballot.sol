@@ -44,7 +44,7 @@ contract Nominateable is Stageable, OwnedByChairman {
     uint vote;
   }
 
-  mapping(bytes32 => Proposal) private _nominated;
+  mapping(bytes32 => Proposal) internal _nominated;
   bytes32[] public proposals;
 
   event Nominated(bytes32 proposal);
@@ -73,10 +73,15 @@ contract Registrable is Stageable, OwnedByChairman {
     bool voted;
   }
 
-  mapping(address => Voter) private _voters;
+  mapping(address => Voter) internal _voters;
   uint public votersCount;
 
   event Registered(address voter, uint order);
+
+  modifier registered(address voter) {
+    require(_voters[voter].registered);
+    _;
+  }
 
   modifier neverRegistered(address voter) {
     require(!_voters[voter].registered);
@@ -110,5 +115,9 @@ contract Ballot is Nominateable, Registrable {
 
   function start() public onlyChairman atLeastTwoProposalNominated {
     _stage = Stage.Voting;
+  }
+
+  function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {
+    _voters[msg.sender].voted = true;
   }
 }
