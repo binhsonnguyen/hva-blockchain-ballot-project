@@ -16,9 +16,9 @@ Reqs
 
 ```
 [x] Người xuất bản ứng dụng là CHỦ TOẠ.
-[ ] Chỉ có CHỦ TOẠ được thêm ứng viên (người được bầu)
-[ ] Chỉ có CHỦ TOẠ được thêm cử tri (người đi bầu)
-[ ] Chỉ có CHỦ TOẠ được bắt đầu việc bầu cử. START
+[x] Chỉ có CHỦ TOẠ được thêm ứng viên (người được bầu)
+[x] Chỉ có CHỦ TOẠ được thêm cử tri (người đi bầu)
+[x] Chỉ có CHỦ TOẠ được bắt đầu việc bầu cử. START
 [ ] Chỉ có CHỦ TOẠ được phép kết thúc bầu cử. FINISH
 [ ] Chỉ có CHỦ TOẠ được phép reset bầu cử. RESET (xóa tất cả thông tin ứng viên và cử tri)
 [ ] Chỉ được bắt đầu bầu cử nếu có ít nhất 2 ứng viên.

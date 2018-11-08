@@ -1,0 +1,1 @@
+module.exports = contract => () => ({by: by => contract.start({from: by})})

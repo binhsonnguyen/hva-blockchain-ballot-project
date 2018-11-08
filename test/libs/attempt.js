@@ -1,12 +1,13 @@
 let log = console.log
 
-module.exports = asyncAction => ({
+module.exports = (asyncAction, debug) => ({
   should: {
     be: {
       rejected: async () => {
         try {
           await asyncAction()
         } catch (e) {
+          if (debug) log(e)
           assert.ok(true)
           return
         }
@@ -16,7 +17,7 @@ module.exports = asyncAction => ({
         try {
           await asyncAction()
         } catch (e) {
-          assert.fail(log(e))
+          assert.fail( debug ? log(e) : undefined)
         }
       }
     }

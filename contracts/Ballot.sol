@@ -106,7 +106,7 @@ contract Ballot is Nominateable, Registrable {
     _stage = Stage.Preparing;
   }
 
-  function start() public atLeastTwoProposalNominated {
+  function start() public onlyChairman atLeastTwoProposalNominated {
     _stage = Stage.Voting;
   }
 }

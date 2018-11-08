@@ -2,6 +2,7 @@ const Ballot = artifacts.require('./Ballot.sol')
 
 const Nominate = require('./libs/nominate.js')
 const Register = require('./libs/register.js')
+const Start = require('./libs/start.js')
 const Vote = require('./libs/vote.js')
 const attempt = require('./libs/attempt.js')
 
@@ -18,11 +19,13 @@ contract('ballot/preparing', accounts => {
   let contract = null
   let nominate = null
   let register = null
+  let start = null
 
   beforeEach(async () => {
     contract = await Ballot.new()
     nominate = Nominate(contract)
     register = Register(contract)
+    start = Start(contract)
   })
 
   it('...should reject others registering', async () => {
@@ -61,14 +64,22 @@ contract('ballot/preparing', accounts => {
     await attempt(async () => {
       await nominate(A_PROPOSAL).by(CHAIR)
       await nominate(ANOTHER_PROPOSAL).by(CHAIR)
-      await contract.start()
+      await start().by(CHAIR)
     }).should.be.succeed()
   })
 
   it('...should reject chairman start ballot pharse if at least two proposal nominated', async () => {
     await attempt(async () => {
       await nominate(A_PROPOSAL).by(CHAIR)
-      await contract.start()
+      await start().by(CHAIR)
+    }).should.be.rejected()
+  })
+
+  it('...should reject others start ballot', async () => {
+    await attempt(async () => {
+      await nominate(A_PROPOSAL).by(CHAIR)
+      await nominate(AN_OTHER_VOTER).by(CHAIR)
+      await start().by(A_VOTER)
     }).should.be.rejected()
   })
 
