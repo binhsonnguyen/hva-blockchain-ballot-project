@@ -1,14 +1,14 @@
 const Ballot = artifacts.require('./Ballot.sol')
 
+const Nominate = require('./libs/nominate.js')
 const Register = require('./libs/register.js')
 const Vote = require('./libs/vote.js')
-const Nominate = require('./libs/nominate.js')
 const attempt = require('./libs/attempt.js')
 
 const log = console.log
 
 const A_PROPOSAL = 'WINNER' // 0x57494e4e4552
-const ANOTHER_PROPOSAL = 'LOSSER' // 0x4c4f53534552
+const ANOTHER_PROPOSAL = 'LOOSER' // 0x4c4f4f534552
 
 contract('ballot/preparing', accounts => {
   const CHAIR = accounts[0]
@@ -16,21 +16,13 @@ contract('ballot/preparing', accounts => {
   const AN_OTHER_VOTER = accounts[2]
 
   let contract = null
-  let register = null
   let nominate = null
-  let vote = null
+  let register = null
 
   beforeEach(async () => {
     contract = await Ballot.new()
-    register = Register(contract)
     nominate = Nominate(contract)
-    vote = Vote(contract)
-  })
-
-  it('...should reject chairman attempt registering', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-    }).should.be.rejected()
+    register = Register(contract)
   })
 
   it('...should reject others registering', async () => {
@@ -63,5 +55,20 @@ contract('ballot/preparing', accounts => {
     let anOtherExpected = web3.fromUtf8(ANOTHER_PROPOSAL)
     let anOtherResult = await contract.proposals.call(1)
     assert.ok(anOtherResult.startsWith(anOtherExpected))
+  })
+
+  it('...should let chairman start ballot pharse', async () => {
+    await attempt(async () => {
+      await nominate(A_PROPOSAL).by(CHAIR)
+      await nominate(ANOTHER_PROPOSAL).by(CHAIR)
+      await contract.start()
+    }).should.be.succeed()
+  })
+
+  it('...should reject chairman start ballot pharse if at least two proposal nominated', async () => {
+    await attempt(async () => {
+      await nominate(A_PROPOSAL).by(CHAIR)
+      await contract.start()
+    }).should.be.rejected()
   })
 })

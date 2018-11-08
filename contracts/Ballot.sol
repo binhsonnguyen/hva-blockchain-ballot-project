@@ -4,7 +4,6 @@ pragma solidity 0.4.24;
 contract Stageable {
   enum Stage {
     Preparing,
-    Registering,
     Voting,
     Finished
   }
@@ -13,11 +12,6 @@ contract Stageable {
 
   modifier inPreparingTime() {
     require(_stage == Stage.Preparing);
-    _;
-  }
-
-  modifier inRegisteringTime() {
-    require(_stage == Stage.Registering);
     _;
   }
 
@@ -83,7 +77,7 @@ contract Registrable is Stageable, OwnedByChairman {
     _;
   }
 
-  function register(address voter) public onlyChairman inRegisteringTime neverVoted(voter) {
+  function register(address voter) public onlyChairman inPreparingTime neverVoted(voter) {
     _voters[voter] = false;
     emit Registered(voter);
   }
@@ -91,8 +85,17 @@ contract Registrable is Stageable, OwnedByChairman {
 
 
 contract Ballot is Nominateable, Registrable {
+  modifier atLeastTwoProposalNominated () {
+    require(proposalsCount() >= 2);
+    _;
+  }
+
   constructor () public {
     _chairman = msg.sender;
     _stage = Stage.Preparing;
+  }
+
+  function start() public atLeastTwoProposalNominated {
+    _stage = Stage.Voting;
   }
 }
