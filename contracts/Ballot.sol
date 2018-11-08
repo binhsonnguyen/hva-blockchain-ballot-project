@@ -68,17 +68,28 @@ contract Nominateable is Stageable, OwnedByChairman {
 
 
 contract Registrable is Stageable, OwnedByChairman {
-  mapping(address => bool) private _voters;
+  struct Voter {
+    bool registered;
+    bool voted;
+  }
+
+  mapping(address => Voter) private _voters;
 
   event Registered(address voter);
 
-  modifier neverVoted(address voter) {
-    require(!_voters[voter]);
+  modifier neverRegistered(address voter) {
+    require(!_voters[voter].registered);
     _;
   }
 
-  function register(address voter) public onlyChairman inPreparingTime neverVoted(voter) {
-    _voters[voter] = false;
+  modifier neverVoted(address voter) {
+    require(!_voters[voter].voted);
+    _;
+  }
+
+  function register(address voter) public onlyChairman inPreparingTime neverRegistered(voter) neverVoted(voter) {
+    _voters[voter].registered = true;
+    _voters[voter].voted = false;
     emit Registered(voter);
   }
 }
