@@ -60,6 +60,26 @@ contract('ballot/preparing', accounts => {
     assert.ok(anOtherResult.startsWith(anOtherExpected))
   })
 
+  it('...should let chairman register voters', async () => {
+    await attempt(async () => {
+      await register(A_VOTER).by(CHAIR)
+      await register(AN_OTHER_VOTER).by(CHAIR)
+    }).should.be.succeed()
+  })
+
+  it('...should reject someone else register a voter', async () => {
+    await attempt(async () => {
+      await register(A_VOTER).by(AN_OTHER_VOTER)
+    }).should.be.rejected()
+  })
+
+  it('...should reject chairman register a voter twice', async () => {
+    await attempt(async () => {
+      await register(A_VOTER).by(CHAIR)
+      await register(A_VOTER).by(CHAIR)
+    }).should.be.rejected()
+  })
+
   it('...should let chairman start ballot pharse', async () => {
     await attempt(async () => {
       await nominate(A_PROPOSAL).by(CHAIR)
@@ -80,26 +100,6 @@ contract('ballot/preparing', accounts => {
       await nominate(A_PROPOSAL).by(CHAIR)
       await nominate(AN_OTHER_VOTER).by(CHAIR)
       await start().by(A_VOTER)
-    }).should.be.rejected()
-  })
-
-  it('...should let chairman register voters', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-      await register(AN_OTHER_VOTER).by(CHAIR)
-    }).should.be.succeed()
-  })
-
-  it('...should reject someone else register a voter', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(AN_OTHER_VOTER)
-    }).should.be.rejected()
-  })
-
-  it('...should reject chairman register a voter twice', async () => {
-    await attempt(async () => {
-      await register(A_VOTER).by(CHAIR)
-      await register(A_VOTER).by(CHAIR)
     }).should.be.rejected()
   })
 })

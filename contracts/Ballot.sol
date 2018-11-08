@@ -74,8 +74,9 @@ contract Registrable is Stageable, OwnedByChairman {
   }
 
   mapping(address => Voter) private _voters;
+  uint public votersCount;
 
-  event Registered(address voter);
+  event Registered(address voter, uint order);
 
   modifier neverRegistered(address voter) {
     require(!_voters[voter].registered);
@@ -90,7 +91,8 @@ contract Registrable is Stageable, OwnedByChairman {
   function register(address voter) public onlyChairman inPreparingTime neverRegistered(voter) neverVoted(voter) {
     _voters[voter].registered = true;
     _voters[voter].voted = false;
-    emit Registered(voter);
+    votersCount++;
+    emit Registered(voter, votersCount);
   }
 }
 
