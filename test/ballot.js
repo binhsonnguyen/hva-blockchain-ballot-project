@@ -134,4 +134,10 @@ contract('ballot/started', accounts => {
       await vote(0).by(A_VOTER)
     }).should.be.succeed()
   })
+
+  it('...should reject not registered voter do vote', async () => {
+    attempt(async () => {
+      await vote(0).by(NOT_REGISTERED)
+    }).should.be.rejected()
+  })
 })
