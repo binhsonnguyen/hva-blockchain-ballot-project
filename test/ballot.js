@@ -3,6 +3,7 @@ const Ballot = artifacts.require('./Ballot.sol')
 const Nominate = require('./libs/nominate.js')
 const Register = require('./libs/register.js')
 const Start = require('./libs/start.js')
+const Finish = require('./libs/finishes.js')
 const Vote = require('./libs/vote.js')
 const attempt = require('./libs/attempt.js')
 
@@ -122,6 +123,7 @@ contract('ballot, given when started, it...', accounts => {
   let nominate = null
   let register = null
   let start = null
+  let finishes = null
   let vote = null
 
   beforeEach(async () => {
@@ -129,6 +131,7 @@ contract('ballot, given when started, it...', accounts => {
     nominate = Nominate(contract)
     register = Register(contract)
     start = Start(contract)
+    finishes = Finish(contract)
     vote = Vote(contract)
     await nominate(A_PROPOSAL).by(CHAIR)
     await nominate(ANOTHER_PROPOSAL).by(CHAIR)
@@ -139,33 +142,41 @@ contract('ballot, given when started, it...', accounts => {
   })
 
   it('...should reject chairman do register', async () => {
-    attempt(async () => {
+    await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
     }).should.be.rejected()
   })
 
   it('...should let registered voter do vote', async () => {
-    attempt(async () => {
+    await attempt(async () => {
       await vote(WINNER).by(A_VOTER)
     }).should.be.succeed()
   })
 
   it('...should reject not registered voter do vote', async () => {
-    attempt(async () => {
+    await attempt(async () => {
       await vote(WINNER).by(NOT_REGISTERED)
     }).should.be.rejected()
   })
 
   it('...should reject registered voter do vote twice', async () => {
-    attempt(async () => {
+    await attempt(async () => {
       await vote(WINNER).by(A_VOTER)
       await vote(LOOSER).by(A_VOTER)
     }).should.be.rejected()
   })
 
-  it('...chairman could do vote, too', async () => {
-    attempt(async () => {
+  it('...should let chairman could do vote, too', async () => {
+    await attempt(async () => {
       await vote(WINNER).by(CHAIR)
+    }).should.be.succeed()
+  })
+
+  it('...should let chairman finishes ballot', async () => {
+    await attempt(async () => {
+      await vote(WINNER).by(A_VOTER)
+      await vote(LOOSER).by(AN_OTHER_VOTER)
+      await finishes().by(CHAIR)
     }).should.be.succeed()
   })
 })
