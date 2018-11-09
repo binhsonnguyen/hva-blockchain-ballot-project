@@ -13,7 +13,7 @@ const ANOTHER_PROPOSAL = 'LOOSER' // 0x4c4f4f534552
 const WINNER = 0 // 0x4c4f4f534552
 const LOOSER = 1 // 0x4c4f4f534552
 
-contract('ballot/preparing', accounts => {
+contract('ballot, given when preparing, it...', accounts => {
   const CHAIR = accounts[0]
   const A_VOTER = accounts[1]
   const AN_OTHER_VOTER = accounts[2]
@@ -112,7 +112,7 @@ contract('ballot/preparing', accounts => {
   })
 })
 
-contract('ballot/started', accounts => {
+contract('ballot, given when started, it...', accounts => {
   const CHAIR = accounts[0]
   const A_VOTER = accounts[1]
   const AN_OTHER_VOTER = accounts[2]
@@ -136,6 +136,12 @@ contract('ballot/started', accounts => {
     await register(A_VOTER).by(CHAIR)
     await register(AN_OTHER_VOTER).by(CHAIR)
     await contract.start()
+  })
+
+  it('...should reject chairman do register', async () => {
+    attempt(async () => {
+      await register(A_VOTER).by(CHAIR)
+    }).should.be.rejected()
   })
 
   it('...should let registered voter do vote', async () => {
