@@ -23,12 +23,14 @@ contract('ballot, given when preparing, it...', accounts => {
   let nominate = null
   let register = null
   let start = null
+  let finishes = null
 
   beforeEach(async () => {
     contract = await Ballot.new()
     nominate = Nominate(contract)
     register = Register(contract)
     start = Start(contract)
+    finishes = Finish(contract)
   })
 
   it('...should reject others registering', async () => {
@@ -109,6 +111,12 @@ contract('ballot, given when preparing, it...', accounts => {
       await nominate(A_PROPOSAL).by(CHAIR)
       await nominate(AN_OTHER_VOTER).by(CHAIR)
       await start().by(A_VOTER)
+    }).should.be.rejected()
+  })
+
+  it('...should reject chairman finishes ballot', async () => {
+    await attempt(async () => {
+      await finishes().by(CHAIR)
     }).should.be.rejected()
   })
 })

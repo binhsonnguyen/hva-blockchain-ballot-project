@@ -117,7 +117,7 @@ contract Ballot is Nominateable, Registrable {
     _stage = Stage.Voting;
   }
 
-  function finish() public onlyChairman {
+  function finish() public onlyChairman inVoteTime {
     _stage = Stage.Finished;
   }
 
