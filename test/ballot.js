@@ -187,4 +187,12 @@ contract('ballot, given when started, it...', accounts => {
       await finishes().by(CHAIR)
     }).should.be.succeed()
   })
+
+  it('...should reject voter finishes ballot', async () => {
+    await attempt(async () => {
+      await vote(WINNER).by(A_VOTER)
+      await vote(LOOSER).by(AN_OTHER_VOTER)
+      await finishes().by(A_VOTER)
+    }).should.be.rejected()
+  })
 })
