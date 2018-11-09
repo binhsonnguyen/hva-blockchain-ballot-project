@@ -19,12 +19,12 @@ Reqs
 [x] Chỉ có CHỦ TOẠ được thêm ứng viên (người được bầu)
 [x] Chỉ có CHỦ TOẠ được thêm cử tri (người đi bầu)
 [x] Chỉ có CHỦ TOẠ được bắt đầu việc bầu cử. START
-[ ] Chỉ có CHỦ TOẠ được phép kết thúc bầu cử. FINISH
-[ ] Chỉ có CHỦ TOẠ được phép reset bầu cử. RESET (xóa tất cả thông tin ứng viên và cử tri)
+[_] Chỉ có CHỦ TOẠ được phép kết thúc bầu cử. FINISH
+[_] Chỉ có CHỦ TOẠ được phép reset bầu cử. RESET (xóa tất cả thông tin ứng viên và cử tri)
 [x] Chỉ được bắt đầu bầu cử nếu có ít nhất 2 ứng viên.
-[ ] Chỉ được phép kết thúc bầu cử nếu có ít nhất 50% cử tri đã bầu.
-[ ] Không có 2 ứng viên giống tên nhau.
-[ ] Chỉ có cử tri được có tên có thể bầu cử.
+[_] Chỉ được phép kết thúc bầu cử nếu có ít nhất 50% cử tri đã bầu.
+[_] Không có 2 ứng viên giống tên nhau.
+[x] Chỉ có cử tri được có tên có thể bầu cử.
 [ ] Mỗi cử tri có giá trị 1 phiếu.
 [ ] Mỗi cử tri được bầu 1 lần.
 ```
