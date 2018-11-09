@@ -11,13 +11,16 @@ module.exports = (asyncAction, debug) => ({
           assert.ok(true)
           return
         }
+        if (debug) log("no any exception thrown")
         assert.fail()
       },
       succeed: async () => {
         try {
           await asyncAction()
+          if (debug) log("no any exception thrown")
         } catch (e) {
-          assert.fail( debug ? log(e) : undefined)
+          if (debug) log(e)
+          assert.fail()
         }
       }
     }

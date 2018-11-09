@@ -10,6 +10,8 @@ const log = console.log
 
 const A_PROPOSAL = 'WINNER' // 0x57494e4e4552
 const ANOTHER_PROPOSAL = 'LOOSER' // 0x4c4f4f534552
+const WINNER = 0 // 0x4c4f4f534552
+const LOOSER = 1 // 0x4c4f4f534552
 
 contract('ballot/preparing', accounts => {
   const CHAIR = accounts[0]
@@ -130,6 +132,7 @@ contract('ballot/started', accounts => {
     vote = Vote(contract)
     await nominate(A_PROPOSAL).by(CHAIR)
     await nominate(ANOTHER_PROPOSAL).by(CHAIR)
+    await register(CHAIR).by(CHAIR)
     await register(A_VOTER).by(CHAIR)
     await register(AN_OTHER_VOTER).by(CHAIR)
     await contract.start()
@@ -137,20 +140,26 @@ contract('ballot/started', accounts => {
 
   it('...should let registered voter do vote', async () => {
     attempt(async () => {
-      await vote(0).by(A_VOTER)
+      await vote(WINNER).by(A_VOTER)
     }).should.be.succeed()
   })
 
   it('...should reject not registered voter do vote', async () => {
     attempt(async () => {
-      await vote(0).by(NOT_REGISTERED)
+      await vote(WINNER).by(NOT_REGISTERED)
     }).should.be.rejected()
   })
 
   it('...should reject registered voter do vote twice', async () => {
     attempt(async () => {
-      await vote(0).by(A_VOTER)
-      await vote(1).by(A_VOTER)
+      await vote(WINNER).by(A_VOTER)
+      await vote(LOOSER).by(A_VOTER)
     }).should.be.rejected()
+  })
+
+  it('...chairman could do vote, too', async () => {
+    attempt(async () => {
+      await vote(WINNER).by(CHAIR)
+    }).should.be.succeed()
   })
 })
