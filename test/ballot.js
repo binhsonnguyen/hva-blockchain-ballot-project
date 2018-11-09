@@ -140,4 +140,11 @@ contract('ballot/started', accounts => {
       await vote(0).by(NOT_REGISTERED)
     }).should.be.rejected()
   })
+
+  it('...should reject registered voter do vote twice', async () => {
+    attempt(async () => {
+      await vote(0).by(A_VOTER)
+      await vote(1).by(A_VOTER)
+    }).should.be.rejected()
+  })
 })
