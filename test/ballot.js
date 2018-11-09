@@ -146,7 +146,7 @@ contract('ballot, given when started, it...', accounts => {
     await register(CHAIR).by(CHAIR)
     await register(A_VOTER).by(CHAIR)
     await register(AN_OTHER_VOTER).by(CHAIR)
-    await contract.start()
+    await start().by(CHAIR)
   })
 
   it('...should reject chairman do register', async () => {
