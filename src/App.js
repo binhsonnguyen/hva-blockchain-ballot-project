@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import logo from './img/banner.svg'
 import getWeb3 from './utils/getWeb3'
 
 import Ballot from './contracts/Ballot.json'
@@ -45,8 +44,6 @@ class App extends Component {
 
     this.updateProposals()
 
-    let voters = Number(await contract.votersCount.call())
-
     // this.setState({proposalsCount: proposals})
   }
 
@@ -56,7 +53,12 @@ class App extends Component {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1 header">
-              <img src={logo} alt="drizzle-logo"/>
+              <br/><br/>
+              <cite>20 years from now you will be more disappointed by the things
+                that you did not do than by the ones you did do, so throw off the
+                bowlines, sail away from safe harbor, catch the trade winds in your
+                sails. Explore, Dream, GoodDiscover.</cite>
+              <blockquote>Mark Twain</blockquote>
               <br/><br/>
               <h3>Danh sách bầu cử ( người):</h3>
               // TODO: radio list + Button Vote
@@ -78,12 +80,56 @@ class App extends Component {
     )
   }
 
-  updateProposals () {
-    log("hello")
+  contract = () => this.state.contract
+
+  async updateProposals () {
+    let voters = Number(await this.contract().votersCount.call())
+    this.setState({votersCount: voters})
   }
 
-  updateVoters () {
-    log("hello")
+  async updateVoters () {
+    let voters = Number(await this.contract().votersCount.call())
+    this.setState({votersCount: voters})
+  }
+
+  async start() {
+    await this.contract().start()
+  }
+
+  async finish() {
+    await this.contract().finish()
+  }
+
+  async nominate(proposal) {
+    await this.contract().nominate(proposal)
+  }
+
+  async register(voter) {
+    await this.contract().register(voter)
+  }
+
+  async vote(order) {
+    await this.contract().vote(order)
+  }
+
+  async proposals(order) {
+    await this.contract().proposals(order)
+  }
+
+  async proposalsCount() {
+    await this.contract().proposalsCount()
+  }
+
+  async votedCount(proposal) {
+    return Number(await this.contract().votedCount(proposal))
+  }
+
+  async votersCount() {
+    await this.contract().votersCount()
+  }
+
+  async votesCount() {
+    await this.contract().votesCount()
   }
 }
 
