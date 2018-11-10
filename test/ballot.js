@@ -196,6 +196,13 @@ contract('ballot, given when started, it...', accounts => {
       await finishes().by(A_VOTER)
     }).should.be.rejected()
   })
+
+  it('...only let chairman finishes ballot when at least a half of voter has been voted', async () => {
+    await attempt(async () => {
+      await vote(WINNER).by(A_VOTER)
+      await finishes().by(CHAIR)
+    }).should.be.rejected()
+  })
 })
 
 
