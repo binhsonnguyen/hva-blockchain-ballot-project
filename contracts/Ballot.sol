@@ -70,7 +70,7 @@ contract Nominateable is Stageable, OwnedByChairman {
     emit Nominated(proposal);
   }
 
-  function votedCount(bytes32 proposal) returns (uint) {
+  function votedCount(bytes32 proposal) public finished view returns (uint) {
     return _nominated[proposal].vote;
   }
 }
