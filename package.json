@@ -27,9 +27,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "link-contracts": "run-script-os",
-    "link-contracts:linux:darwin": "cd src && ln -s ../build/contracts contracts",
-    "link-contracts:win32": "cd src && mklink \\D contracts ..\\build\\contracts"
+    "link-contracts": "cd src && rm contracts; ln -s ../build/contracts ./contracts"
   },
   "repository": {
     "type": "git",
