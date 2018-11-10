@@ -90,7 +90,7 @@ contract Registrable is Stageable, OwnedByChairman {
   uint public votersCount;
   uint public votesCount;
 
-  event Registered(address voter, uint order);
+  event Registered(uint votersCount);
 
   modifier registered(address voter) {
     require(_voters[voter].registered);
@@ -116,12 +116,15 @@ contract Registrable is Stageable, OwnedByChairman {
     _voters[voter].registered = true;
     _voters[voter].voted = false;
     votersCount++;
-    emit Registered(voter, votersCount);
+    emit Registered(votersCount);
   }
 }
 
 
 contract Ballot is Nominateable, Registrable {
+  event Started();
+  event Finished();
+
   constructor () public {
     _chairman = msg.sender;
     _stage = Stage.Preparing;
@@ -129,10 +132,12 @@ contract Ballot is Nominateable, Registrable {
 
   function start() public onlyChairman atLeastTwoProposalNominated {
     _stage = Stage.Voting;
+    emit Started();
   }
 
   function finish() public onlyChairman inVoteTime atLeastAHalfVoted {
     _stage = Stage.Finished;
+    emit Finished();
   }
 
   function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {

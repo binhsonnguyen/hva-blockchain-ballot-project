@@ -25,8 +25,8 @@ Reqs
 [x] Chỉ được phép kết thúc bầu cử nếu có ít nhất 50% cử tri đã bầu.
 [_] Không có 2 ứng viên giống tên nhau.
 [x] Chỉ có cử tri được có tên có thể bầu cử.
-[ ] Mỗi cử tri có giá trị 1 phiếu.
-[ ] Mỗi cử tri được bầu 1 lần.
+[1] Mỗi cử tri có giá trị 1 phiếu.
+[2] Mỗi cử tri được bầu 1 lần.
 ```
 
 Kịch bản
