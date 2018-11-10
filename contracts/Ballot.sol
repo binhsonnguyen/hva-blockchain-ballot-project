@@ -128,8 +128,4 @@ contract Ballot is Nominateable, Registrable {
   function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {
     _voters[msg.sender].voted = true;
   }
-
-  function winner() public returns(bytes32) {
-    return proposals[0];
-  }
 }
