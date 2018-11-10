@@ -32,8 +32,12 @@ contract OwnedByChairman {
   address internal _chairman;
 
   modifier onlyChairman() {
-    require(msg.sender == _chairman);
+    require(_isChairman(msg.sender));
     _;
+  }
+
+  function _isChairman(address people) internal returns (bool) {
+    return _chairman == people;
   }
 }
 
@@ -133,7 +137,7 @@ contract Ballot is Nominateable, Registrable {
 
   function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {
     _voters[msg.sender].voted = true;
-    _nominated[proposals[order]].vote++;
+    _nominated[proposals[order]].vote += _isChairman(msg.sender) ? 2 : 1;
     votesCount++;
   }
 }

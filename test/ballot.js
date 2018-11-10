@@ -251,4 +251,13 @@ contract('ballot, given when finished, it...', accounts => {
       let voted = Number(await votedCount().of(A_PROPOSAL))
     }).should.be.rejected()
   })
+
+  it('...should give chairmain 2 vote weight', async () => {
+    await vote(WINNER).by(A_VOTER)
+    await vote(WINNER).by(AN_OTHER_VOTER)
+    await vote(WINNER).by(CHAIR)
+    await finishes().by(CHAIR)
+    let voted = Number(await votedCount().of(A_PROPOSAL))
+    assert.strictEqual(voted, 4)
+  })
 })
