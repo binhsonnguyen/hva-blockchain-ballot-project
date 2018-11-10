@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import logo from './logo.svg'
+import logo from './img/banner.svg'
 import getWeb3 from './utils/getWeb3'
 
 import Ballot from './contracts/Ballot.json'
@@ -25,7 +25,13 @@ class App extends Component {
 
       const instance = await Contract.deployed()
 
-      this.setState({web3, accounts, contract: instance}, this.runExample)
+      let state = {
+        web3,
+        accounts,
+        contract: instance
+      }
+
+      this.setState(state, this.runExample)
     } catch (error) {
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`
@@ -37,10 +43,11 @@ class App extends Component {
   runExample = async () => {
     const {accounts, contract} = this.state
 
-    let proposals = Number(await contract.proposalsCount.call())
-    log('proposal count', proposals)
+    this.updateProposals()
 
-    this.setState({proposalsCount: proposals})
+    let voters = Number(await contract.votersCount.call())
+
+    // this.setState({proposalsCount: proposals})
   }
 
   render () {
@@ -50,15 +57,18 @@ class App extends Component {
           <div className="pure-g">
             <div className="pure-u-1-1 header">
               <img src={logo} alt="drizzle-logo"/>
-              <h1>Drizzle Examples</h1>
-              <p>Examples of how to get started with Drizzle in various situations.</p>
-
+              <br/><br/>
+              <h3>Danh sách bầu cử ( người):</h3>
+              // TODO: radio list + Button Vote
+              <button onClick={() => this.updateProposals()}>Cập nhật</button>
+              <br/><br/>
+              <h3>Người bỏ phiếu đã đăng ký: </h3>
+              <button onClick={() => this.updateVoters()}>Cập nhật</button>
               <br/><br/>
             </div>
 
             <div className="pure-u-1-1">
               <h2>Active Account</h2>
-              <AccountData accountIndex="0" units="ether" precision="3" />
 
               <br/><br/>
             </div>
@@ -66,6 +76,14 @@ class App extends Component {
         </main>
       </div>
     )
+  }
+
+  updateProposals () {
+    log("hello")
+  }
+
+  updateVoters () {
+    log("hello")
   }
 }
 
