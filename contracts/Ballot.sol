@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity ^0.4.24;
 
 
 contract Stageable {
@@ -54,6 +54,11 @@ contract Nominateable is Stageable, OwnedByChairman {
     _;
   }
 
+  modifier atLeastTwoProposalNominated () {
+    require(proposalsCount() >= 2);
+    _;
+  }
+
   function proposalsCount() public view returns (uint) {
     return proposals.length;
   }
@@ -65,7 +70,7 @@ contract Nominateable is Stageable, OwnedByChairman {
     emit Nominated(proposal);
   }
 
-  function votedCount(bytes32 proposal) returns(uint) {
+  function votedCount(bytes32 proposal) returns (uint) {
     return _nominated[proposal].vote;
   }
 }
@@ -79,6 +84,7 @@ contract Registrable is Stageable, OwnedByChairman {
 
   mapping(address => Voter) internal _voters;
   uint public votersCount;
+  uint public votesCount;
 
   event Registered(address voter, uint order);
 
@@ -97,6 +103,11 @@ contract Registrable is Stageable, OwnedByChairman {
     _;
   }
 
+  modifier atLeastAHalfVoted() {
+    require(votesCount > 0 && votersCount / votesCount <= 2);
+    _;
+  }
+
   function register(address voter) public onlyChairman inPreparingTime neverRegistered(voter) neverVoted(voter) {
     _voters[voter].registered = true;
     _voters[voter].voted = false;
@@ -107,11 +118,6 @@ contract Registrable is Stageable, OwnedByChairman {
 
 
 contract Ballot is Nominateable, Registrable {
-  modifier atLeastTwoProposalNominated () {
-    require(proposalsCount() >= 2);
-    _;
-  }
-
   constructor () public {
     _chairman = msg.sender;
     _stage = Stage.Preparing;
@@ -121,11 +127,12 @@ contract Ballot is Nominateable, Registrable {
     _stage = Stage.Voting;
   }
 
-  function finish() public onlyChairman inVoteTime {
+  function finish() public onlyChairman inVoteTime atLeastAHalfVoted {
     _stage = Stage.Finished;
   }
 
   function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {
     _voters[msg.sender].voted = true;
+    votesCount++;
   }
 }
