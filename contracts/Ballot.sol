@@ -133,6 +133,7 @@ contract Ballot is Nominateable, Registrable {
 
   function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {
     _voters[msg.sender].voted = true;
+    _nominated[proposals[order]].vote++;
     votesCount++;
   }
 }
