@@ -64,6 +64,10 @@ contract Nominateable is Stageable, OwnedByChairman {
     proposals.push(proposal);
     emit Nominated(proposal);
   }
+
+  function votedCount(bytes32 proposal) returns(uint) {
+    return _nominated[proposal].vote;
+  }
 }
 
 
@@ -123,5 +127,9 @@ contract Ballot is Nominateable, Registrable {
 
   function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {
     _voters[msg.sender].voted = true;
+  }
+
+  function winner() public returns(bytes32) {
+    return proposals[0];
   }
 }

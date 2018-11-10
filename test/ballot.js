@@ -4,6 +4,7 @@ const Nominate = require('./libs/nominate.js')
 const Register = require('./libs/register.js')
 const Start = require('./libs/start.js')
 const Finish = require('./libs/finishes.js')
+const VotedCount = require('./libs/voted-count.js')
 const Vote = require('./libs/vote.js')
 const attempt = require('./libs/attempt.js')
 
@@ -194,5 +195,44 @@ contract('ballot, given when started, it...', accounts => {
       await vote(LOOSER).by(AN_OTHER_VOTER)
       await finishes().by(A_VOTER)
     }).should.be.rejected()
+  })
+})
+
+
+contract('ballot, given when finished, it...', accounts => {
+  const CHAIR = accounts[0]
+  const A_VOTER = accounts[1]
+  const AN_OTHER_VOTER = accounts[2]
+  const NOT_REGISTERED = accounts[3]
+
+  let contract = null
+  let nominate = null
+  let register = null
+  let start = null
+  let finishes = null
+  let votedCount = null
+  let vote = null
+
+  beforeEach(async () => {
+    contract = await Ballot.new()
+    nominate = Nominate(contract)
+    register = Register(contract)
+    start = Start(contract)
+    finishes = Finish(contract)
+    votedCount = VotedCount(contract)
+    vote = Vote(contract)
+    await nominate(A_PROPOSAL).by(CHAIR)
+    await nominate(ANOTHER_PROPOSAL).by(CHAIR)
+    await register(CHAIR).by(CHAIR)
+    await register(A_VOTER).by(CHAIR)
+    await register(AN_OTHER_VOTER).by(CHAIR)
+    await start().by(CHAIR)
+  })
+
+  it('...should let people get voted count of a specified proposal', async () => {
+    await vote(WINNER).by(A_VOTER)
+    await vote(WINNER).by(AN_OTHER_VOTER)
+    let voted = Number(await votedCount().of(A_PROPOSAL))
+    assert.strictEqual(voted, 2)
   })
 })
