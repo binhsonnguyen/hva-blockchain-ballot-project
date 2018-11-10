@@ -239,6 +239,7 @@ contract('ballot, given when finished, it...', accounts => {
   it('...should let people get voted count of a specified proposal', async () => {
     await vote(WINNER).by(A_VOTER)
     await vote(WINNER).by(AN_OTHER_VOTER)
+    await finishes().by(CHAIR)
     let voted = Number(await votedCount().of(A_PROPOSAL))
     assert.strictEqual(voted, 2)
   })
