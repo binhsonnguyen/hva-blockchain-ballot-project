@@ -17,8 +17,12 @@ class App extends Component {
 
       const accounts = await web3.eth.getAccounts()
 
+      const provider = web3.currentProvider
+      provider.enable()
+
       const Contract = truffleContract(Ballot)
-      Contract.setProvider(web3.currentProvider)
+      Contract.setProvider(provider)
+
       const instance = await Contract.deployed()
 
       this.setState({web3, accounts, contract: instance}, this.runExample)
@@ -42,20 +46,24 @@ class App extends Component {
   render () {
     return (
       <div className='App'>
-        <header className='App-header'>
-          <img src={logo} className='App-logo' alt='logo'/>
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className='App-link'
-            href='https://reactjs.org'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Learn React
-          </a>
-        </header>
+        <main className="container">
+          <div className="pure-g">
+            <div className="pure-u-1-1 header">
+              <img src={logo} alt="drizzle-logo"/>
+              <h1>Drizzle Examples</h1>
+              <p>Examples of how to get started with Drizzle in various situations.</p>
+
+              <br/><br/>
+            </div>
+
+            <div className="pure-u-1-1">
+              <h2>Active Account</h2>
+              <AccountData accountIndex="0" units="ether" precision="3" />
+
+              <br/><br/>
+            </div>
+          </div>
+        </main>
       </div>
     )
   }
