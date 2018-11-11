@@ -93,12 +93,6 @@ class App extends Component {
           <div className="pure-g">
             <div className="pure-u-1-1 header">
               <br/><br/>
-              <cite>20 years from now you will be more disappointed by the things
-                that you did not do than by the ones you did do, so throw off the
-                bowlines, sail away from safe harbor, catch the trade winds in your
-                sails. Explore, Dream, GoodDiscover.</cite>
-              <blockquote>Mark Twain</blockquote>
-              <br/><br/>
               <h3>Danh sách bầu cử ( người): {this.state.PROPOSALS_COUNT}</h3>
               <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.voteChanged}>
                 <label><Radio value="0"/>Apple</label>

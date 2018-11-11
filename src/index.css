@@ -9,6 +9,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+#cow {
+    width: auto;
+    margin: auto;
+}
+pre {
+    white-space: pre-wrap;
+}
+blockquote footer {
+  text-align: right;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
