@@ -49,23 +49,26 @@ class App extends Component {
       err('componentDidMount', error)
     }
   }
-  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call())
-  votersCount = async () => Number(await this.state.contract.votersCount.call())
-  start = async () => await this.state.contract.start()
-  finish = async () => await this.state.contract.finish()
-  nominate = async proposal => await this.state.contract.nominate(proposal)
-  register = async voter => await this.state.contract.register(voter)
+  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: this.state.accounts[0]}))
+  votersCount = async () => Number(await this.state.contract.votersCount.call({from: this.state.accounts[0]}))
+  start = async () => await this.state.contract.start({from: this.state.accounts[0]})
+  finish = async () => await this.state.contract.finish({from: this.state.accounts[0]})
+  nominate = async proposal => {
+    await this.state.contract.nominate(proposal, {from: this.state.accounts[0]})
+  }
+  register = async voter => await this.state.contract.register(voter, {from: this.state.accounts[0]})
   vote = async order => await this.state.contract.vote(order, {from: this.state.accounts[0]})
-  proposals = async (order) => await this.state.contract.proposals(order)
-  votedCount = async (proposal) => Number(await this.state.contract.votedCount(proposal))
-  votesCount = async () => await this.state.contract.votesCount()
+  proposals = async (order) => await this.state.contract.proposals(order, {from: this.state.accounts[0]})
+  votedCount = async (proposal) => Number(await this.state.contract.votedCount(proposal, {from: this.state.accounts[0]}))
+  votesCount = async () => await this.state.contract.votesCount.call({from: this.state.accounts[0]})
   voteChanged = async (event) => {
     await this.setState({VOTE: event})
     info('vote changed', await this.state.VOTE)
   }
-  confirmVote = async () => {
-    if (window.confirm('abc')) {
-      info('vote', 'confirmed' + this.state.VOTE)
+  confirmVote = () => {
+    const option = this.state.VOTE
+    if (window.confirm(`Bạn xác nhận bầu cho "${option}"?`)) {
+      info('vote', `confirmed ${option}`)
       // await this.vote(this.state.VOTE)
     }
   }
@@ -74,13 +77,26 @@ class App extends Component {
     await this.setState({PROPOSALS_COUNT: count})
     info('fetchProposals', await this.state.PROPOSALS_COUNT)
   }
+  nominateChanged = event => {
+    this.setState({NOMINATE: event.target.value})
+  }
+  confirmNominate = async () => {
+    const nominate = this.state.NOMINATE
+    if (window.confirm(`Xác nhận đề cử "${nominate}"?`)) {
+      info('nominate', `confirmed ${nominate}`)
+      await this.nominate(nominate)
+      info('nominate', `success ${nominate}`)
+      this.setState({NOMINATE: ''})
+    }
+  }
 
   constructor (props) {
     super(props)
     this.state = {
       PROPOSALS_COUNT: 0,
       VOTERS_COUNT: 0,
-      VOTE: 1
+      NOMINATE: '',
+      VOTE: 0,
     }
   }
 
@@ -96,6 +112,12 @@ class App extends Component {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1 header">
+              <div className="session">
+                <p>Đề cử:
+                  <input type="text" value={this.state.NOMINATE} onChange={this.nominateChanged}/>
+                  <button onClick={() => this.confirmNominate()}>Đề cử</button>
+                </p>
+              </div>
               <div className="session">
                 <p>Hiện có {this.state.PROPOSALS_COUNT} đề cử <button onClick={() => this.fetchProposals()}>Cập
                   nhật</button></p>
