@@ -39,5 +39,11 @@
   "bugs": {
     "url": "https://github.com/binhsonnguyen/hva-blockchain-ballot-project/issues"
   },
-  "homepage": "https://github.com/binhsonnguyen/hva-blockchain-ballot-project#readme"
+  "homepage": "https://github.com/binhsonnguyen/hva-blockchain-ballot-project#readme",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

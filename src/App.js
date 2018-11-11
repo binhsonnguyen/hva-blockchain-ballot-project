@@ -79,57 +79,55 @@ class App extends Component {
       </div>
     )
   }
-
-  contract = () => this.state.contract
-
+  
   async updateProposals () {
-    let voters = Number(await this.contract().votersCount.call())
+    let voters = Number(await this.state.contract.votersCount.call())
     this.setState({votersCount: voters})
   }
 
   async updateVoters () {
-    let voters = Number(await this.contract().votersCount.call())
+    let voters = Number(await this.state.contract.votersCount.call())
     this.setState({votersCount: voters})
   }
 
   async start() {
-    await this.contract().start()
+    await this.state.contract.start()
   }
 
   async finish() {
-    await this.contract().finish()
+    await this.state.contract.finish()
   }
 
   async nominate(proposal) {
-    await this.contract().nominate(proposal)
+    await this.state.contract.nominate(proposal)
   }
 
   async register(voter) {
-    await this.contract().register(voter)
+    await this.state.contract.register(voter)
   }
 
   async vote(order) {
-    await this.contract().vote(order)
+    await this.state.contract.vote(order)
   }
 
   async proposals(order) {
-    await this.contract().proposals(order)
+    await this.state.contract.proposals(order)
   }
 
   async proposalsCount() {
-    await this.contract().proposalsCount()
+    await this.state.contract.proposalsCount()
   }
 
   async votedCount(proposal) {
-    return Number(await this.contract().votedCount(proposal))
+    return Number(await this.state.contract.votedCount(proposal))
   }
 
   async votersCount() {
-    await this.contract().votersCount()
+    await this.state.contract.votersCount()
   }
 
   async votesCount() {
-    await this.contract().votesCount()
+    await this.state.contract.votesCount()
   }
 }
 
