@@ -6,45 +6,53 @@ import truffleContract from 'truffle-contract'
 
 import './App.css'
 
-let log = console.log
+let info = (owner, msg) => console.info(owner, msg)
+let err = (owner, msg) => console.error(owner, msg)
 
 class App extends Component {
 
   componentDidMount = async () => {
     try {
+      const responsible = 'componentDidMount'
+      info(responsible, 'ready to load')
+
       const web3 = await getWeb3()
+      info(responsible, 'web3 loaded')
 
       const accounts = await web3.eth.getAccounts()
+      info(responsible, 'accounts loaded')
 
       const provider = web3.currentProvider
       await provider.enable()
+      info(responsible, 'web3 enabled')
 
       const Contract = truffleContract(Ballot)
       Contract.setProvider(provider)
 
       const instance = await Contract.deployed()
+      info(responsible, 'contract positioned')
 
       let state = {
         web3,
         accounts,
         contract: instance
       }
-
-      this.setState(state, this.runExample)
+      this.setState(state)
+      info(responsible, 'app\'s state loaded with contract and accounts infomation')
     } catch (error) {
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`
       )
-      log(error)
+      err('componentDidMount', error)
     }
   }
 
-  runExample = async () => {
-    const {accounts, contract} = this.state
-
-    this.updateProposals()
-
-    // this.setState({proposalsCount: proposals})
+  constructor (props) {
+    super(props)
+    this.state = {
+      proposalsCount: 0,
+      votersCount: 0
+    }
   }
 
   render () {
@@ -60,11 +68,11 @@ class App extends Component {
                 sails. Explore, Dream, GoodDiscover.</cite>
               <blockquote>Mark Twain</blockquote>
               <br/><br/>
-              <h3>Danh sách bầu cử ( người):</h3>
+              <h3>Danh sách bầu cử ( người): {this.state.votersCount}</h3>
               // TODO: radio list + Button Vote
               <button onClick={() => this.updateProposals()}>Cập nhật</button>
               <br/><br/>
-              <h3>Người bỏ phiếu đã đăng ký: </h3>
+              <h3>Người bỏ phiếu đã đăng ký: {this.state.proposalsCount}</h3>
               <button onClick={() => this.updateVoters()}>Cập nhật</button>
               <br/><br/>
             </div>
@@ -79,7 +87,7 @@ class App extends Component {
       </div>
     )
   }
-  
+
   async updateProposals () {
     let voters = Number(await this.state.contract.votersCount.call())
     this.setState({votersCount: voters})
@@ -90,43 +98,43 @@ class App extends Component {
     this.setState({votersCount: voters})
   }
 
-  async start() {
+  async start () {
     await this.state.contract.start()
   }
 
-  async finish() {
+  async finish () {
     await this.state.contract.finish()
   }
 
-  async nominate(proposal) {
+  async nominate (proposal) {
     await this.state.contract.nominate(proposal)
   }
 
-  async register(voter) {
+  async register (voter) {
     await this.state.contract.register(voter)
   }
 
-  async vote(order) {
+  async vote (order) {
     await this.state.contract.vote(order)
   }
 
-  async proposals(order) {
+  async proposals (order) {
     await this.state.contract.proposals(order)
   }
 
-  async proposalsCount() {
+  async proposalsCount () {
     await this.state.contract.proposalsCount()
   }
 
-  async votedCount(proposal) {
+  async votedCount (proposal) {
     return Number(await this.state.contract.votedCount(proposal))
   }
 
-  async votersCount() {
+  async votersCount () {
     await this.state.contract.votersCount()
   }
 
-  async votesCount() {
+  async votesCount () {
     await this.state.contract.votesCount()
   }
 }
