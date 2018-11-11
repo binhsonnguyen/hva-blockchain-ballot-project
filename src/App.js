@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import getWeb3 from './utils/getWeb3'
-
+import {RadioGroup, Radio} from 'react-radio-group'
 import Ballot from './contracts/Ballot.json'
 import truffleContract from 'truffle-contract'
 
