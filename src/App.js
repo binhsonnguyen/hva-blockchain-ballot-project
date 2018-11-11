@@ -55,10 +55,25 @@ class App extends Component {
   finish = async () => await this.state.contract.finish()
   nominate = async proposal => await this.state.contract.nominate(proposal)
   register = async voter => await this.state.contract.register(voter)
-  vote = async order => await this.state.contract.vote(order)
+  vote = async order => await this.state.contract.vote(order, {from: this.state.accounts[0]})
   proposals = async (order) => await this.state.contract.proposals(order)
   votedCount = async (proposal) => Number(await this.state.contract.votedCount(proposal))
   votesCount = async () => await this.state.contract.votesCount()
+  voteChanged = async (event) => {
+    await this.setState({VOTE: event})
+    info('vote changed', await this.state.VOTE)
+  }
+  confirmVote = async () => {
+    if (window.confirm('abc')) {
+      info('vote', 'confirmed' + this.state.VOTE)
+      // await this.vote(this.state.VOTE)
+    }
+  }
+  fetchProposals = async () => {
+    const count = await this.proposalsCount()
+    await this.setState({PROPOSALS_COUNT: count})
+    info('fetchProposals', await this.state.PROPOSALS_COUNT)
+  }
 
   constructor (props) {
     super(props)
@@ -69,21 +84,10 @@ class App extends Component {
     }
   }
 
-  async fetchProposals () {
-    const count = await this.proposalsCount()
-    await this.setState({PROPOSALS_COUNT: count})
-    info('fetchProposals', await this.state.PROPOSALS_COUNT)
-  }
-
   async fetchVotersCount () {
     const count = await this.votersCount()
     await this.setState({VOTERS_COUNT: count})
     info('fetchVotersCount', await this.state.VOTERS_COUNT)
-  }
-
-  async voteChanged (event) {
-    await this.setState({VOTE: event})
-    info('vote changed', await this.state.VOTE)
   }
 
   render () {
@@ -92,15 +96,17 @@ class App extends Component {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1 header">
-              <br/><br/>
-              <h3>Danh sách bầu cử ( người): {this.state.PROPOSALS_COUNT}</h3>
-              <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.voteChanged}>
-                <label><Radio value="0"/>Apple</label>
-                <label><Radio value="1"/>Orange</label>
-                <label><Radio value="2"/>Watermelon</label>
-              </RadioGroup>
-              <button onClick={() => this.fetchProposals()}>Cập nhật</button>
-              <br/><br/>
+              <div className="session">
+                <p>Hiện có {this.state.PROPOSALS_COUNT} đề cử <button onClick={() => this.fetchProposals()}>Cập
+                  nhật</button></p>
+                <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.voteChanged}>
+                  <label><Radio value="0"/>Apple</label>
+                  <label><Radio value="1"/>Orange</label>
+                  <label><Radio value="2"/>Watermelon</label>
+                </RadioGroup>
+                <button onClick={() => this.confirmVote()}>Bầu</button>
+                <br/><br/>
+              </div>
               <h3>Người bỏ phiếu đã đăng ký: {this.state.VOTERS_COUNT}</h3>
               <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
               <br/><br/>

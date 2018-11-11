@@ -30,3 +30,9 @@
     transform: rotate(360deg);
   }
 }
+
+div.session {
+  border: 1px solid #EEE;
+  padding: 5px 20px;
+  text-align: left;
+}
