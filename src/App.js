@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import getWeb3 from './utils/getWeb3'
-import {RadioGroup, Radio} from 'react-radio-group'
+import { Radio, RadioGroup } from 'react-radio-group'
 import Ballot from './contracts/Ballot.json'
 import truffleContract from 'truffle-contract'
 
@@ -37,8 +37,11 @@ class App extends Component {
         accounts,
         contract: instance
       }
-      this.setState(state)
+      await this.setState(state)
       info(responsible, 'app\'s state loaded with contract and accounts infomation')
+
+      await this.fetchProposals()
+      await this.fetchVotersCount()
     } catch (error) {
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`
@@ -46,13 +49,41 @@ class App extends Component {
       err('componentDidMount', error)
     }
   }
+  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call())
+  votersCount = async () => Number(await this.state.contract.votersCount.call())
+  start = async () => await this.state.contract.start()
+  finish = async () => await this.state.contract.finish()
+  nominate = async proposal => await this.state.contract.nominate(proposal)
+  register = async voter => await this.state.contract.register(voter)
+  vote = async order => await this.state.contract.vote(order)
+  proposals = async (order) => await this.state.contract.proposals(order)
+  votedCount = async (proposal) => Number(await this.state.contract.votedCount(proposal))
+  votesCount = async () => await this.state.contract.votesCount()
 
   constructor (props) {
     super(props)
     this.state = {
-      proposalsCount: 0,
-      votersCount: 0
+      PROPOSALS_COUNT: 0,
+      VOTERS_COUNT: 0,
+      VOTE: 1
     }
+  }
+
+  async fetchProposals () {
+    const count = await this.proposalsCount()
+    await this.setState({PROPOSALS_COUNT: count})
+    info('fetchProposals', await this.state.PROPOSALS_COUNT)
+  }
+
+  async fetchVotersCount () {
+    const count = await this.votersCount()
+    await this.setState({VOTERS_COUNT: count})
+    info('fetchVotersCount', await this.state.VOTERS_COUNT)
+  }
+
+  async voteChanged (event) {
+    await this.setState({VOTE: event})
+    info('vote changed', await this.state.VOTE)
   }
 
   render () {
@@ -68,12 +99,16 @@ class App extends Component {
                 sails. Explore, Dream, GoodDiscover.</cite>
               <blockquote>Mark Twain</blockquote>
               <br/><br/>
-              <h3>Danh sách bầu cử ( người): {this.state.votersCount}</h3>
-              // TODO: radio list + Button Vote
-              <button onClick={() => this.updateProposals()}>Cập nhật</button>
+              <h3>Danh sách bầu cử ( người): {this.state.PROPOSALS_COUNT}</h3>
+              <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.voteChanged}>
+                <label><Radio value="0"/>Apple</label>
+                <label><Radio value="1"/>Orange</label>
+                <label><Radio value="2"/>Watermelon</label>
+              </RadioGroup>
+              <button onClick={() => this.fetchProposals()}>Cập nhật</button>
               <br/><br/>
-              <h3>Người bỏ phiếu đã đăng ký: {this.state.proposalsCount}</h3>
-              <button onClick={() => this.updateVoters()}>Cập nhật</button>
+              <h3>Người bỏ phiếu đã đăng ký: {this.state.VOTERS_COUNT}</h3>
+              <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
               <br/><br/>
             </div>
 
@@ -86,56 +121,6 @@ class App extends Component {
         </main>
       </div>
     )
-  }
-
-  async updateProposals () {
-    let voters = Number(await this.state.contract.votersCount.call())
-    this.setState({votersCount: voters})
-  }
-
-  async updateVoters () {
-    let voters = Number(await this.state.contract.votersCount.call())
-    this.setState({votersCount: voters})
-  }
-
-  async start () {
-    await this.state.contract.start()
-  }
-
-  async finish () {
-    await this.state.contract.finish()
-  }
-
-  async nominate (proposal) {
-    await this.state.contract.nominate(proposal)
-  }
-
-  async register (voter) {
-    await this.state.contract.register(voter)
-  }
-
-  async vote (order) {
-    await this.state.contract.vote(order)
-  }
-
-  async proposals (order) {
-    await this.state.contract.proposals(order)
-  }
-
-  async proposalsCount () {
-    await this.state.contract.proposalsCount()
-  }
-
-  async votedCount (proposal) {
-    return Number(await this.state.contract.votedCount(proposal))
-  }
-
-  async votersCount () {
-    await this.state.contract.votersCount()
-  }
-
-  async votesCount () {
-    await this.state.contract.votesCount()
   }
 }
 
