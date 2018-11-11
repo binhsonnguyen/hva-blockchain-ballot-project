@@ -6,7 +6,7 @@ const Start = require('../libs/start.js')
 const Finish = require('../libs/finishes.js')
 const VotedCount = require('../libs/voted-count.js')
 const Vote = require('../libs/vote.js')
-const attempt = require('../libs/attempt.js')
+const attempt = require('./libs/attempt.js')
 
 const log = console.log
 
