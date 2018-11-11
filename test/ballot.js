@@ -1,12 +1,12 @@
 const Ballot = artifacts.require('./Ballot.sol')
 
-const Nominate = require('./libs/nominate.js')
-const Register = require('./libs/register.js')
-const Start = require('./libs/start.js')
-const Finish = require('./libs/finishes.js')
-const VotedCount = require('./libs/voted-count.js')
-const Vote = require('./libs/vote.js')
-const attempt = require('./libs/attempt.js')
+const Nominate = require('../libs/nominate.js')
+const Register = require('../libs/register.js')
+const Start = require('../libs/start.js')
+const Finish = require('../libs/finishes.js')
+const VotedCount = require('../libs/voted-count.js')
+const Vote = require('../libs/vote.js')
+const attempt = require('../libs/attempt.js')
 
 const log = console.log
 
