@@ -17,7 +17,7 @@ class App extends Component {
       const accounts = await web3.eth.getAccounts()
 
       const provider = web3.currentProvider
-      provider.enable()
+      await provider.enable()
 
       const Contract = truffleContract(Ballot)
       Contract.setProvider(provider)
