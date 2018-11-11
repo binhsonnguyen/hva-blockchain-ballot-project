@@ -3,11 +3,26 @@ import getWeb3 from './utils/getWeb3'
 import { Radio, RadioGroup } from 'react-radio-group'
 import Ballot from './contracts/Ballot.json'
 import truffleContract from 'truffle-contract'
+import Finish from './utils/finishes'
+import Nominate from './utils/nominate'
+import Register from './utils/register'
+import Start from './utils/start'
+import Vote from './utils/vote'
+import VotedCount from './utils/voted-count'
 
 import './App.css'
 
 let info = (owner, msg) => console.info(owner, msg)
 let err = (owner, msg) => console.error(owner, msg)
+
+let chair = null
+let start = null
+let finish = null
+let nominate = null
+let register = null
+let vote = null
+let votedCount = null
+
 
 class App extends Component {
 
@@ -39,6 +54,13 @@ class App extends Component {
       }
       await this.setState(state)
       info(responsible, 'app\'s state loaded with contract and accounts infomation')
+      chair = this.state.accounts[0]
+      start = Start(this.state.contract)
+      finish = Finish(this.state.contract)
+      nominate = Nominate(this.state.contract)
+      register = Register(this.state.contract)
+      vote = Vote(this.state.contract)
+      votedCount = VotedCount(this.state.contract)
 
       await this.fetchProposals()
       await this.fetchVotersCount()
@@ -51,15 +73,7 @@ class App extends Component {
   }
   proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: this.state.accounts[0]}))
   votersCount = async () => Number(await this.state.contract.votersCount.call({from: this.state.accounts[0]}))
-  start = async () => await this.state.contract.start({from: this.state.accounts[0]})
-  finish = async () => await this.state.contract.finish({from: this.state.accounts[0]})
-  nominate = async proposal => {
-    await this.state.contract.nominate(proposal, {from: this.state.accounts[0]})
-  }
-  register = async voter => await this.state.contract.register(voter, {from: this.state.accounts[0]})
-  vote = async order => await this.state.contract.vote(order, {from: this.state.accounts[0]})
   proposals = async (order) => await this.state.contract.proposals(order, {from: this.state.accounts[0]})
-  votedCount = async (proposal) => Number(await this.state.contract.votedCount(proposal, {from: this.state.accounts[0]}))
   votesCount = async () => await this.state.contract.votesCount.call({from: this.state.accounts[0]})
   fetchProposals = async () => {
     const count = await this.proposalsCount()
@@ -85,12 +99,12 @@ class App extends Component {
     await this.setState({VOTE: event})
     info('vote changed', await this.state.VOTE)
   }
-  confirmNominate = async () => {
-    const nominate = this.state.NOMINATE
-    if (window.confirm(`Xác nhận đề cử "${nominate}"?`)) {
-      info('nominate', `confirmed ${nominate}`)
-      await this.nominate(nominate)
-      info('nominate', `success ${nominate}`)
+  onNominate = async () => {
+    const proposal = this.state.NOMINATE
+    if (window.confirm(`Xác nhận đề cử "${proposal}"?`)) {
+      info('nominate', `confirmed ${proposal}`)
+      await nominate(proposal).by(chair)
+      info('nominate', `success ${proposal}`)
       this.setState({NOMINATE: ''})
     }
   }
@@ -114,7 +128,7 @@ class App extends Component {
               <div className="session">
                 <p>Đề cử:
                   <input type="text" value={this.state.NOMINATE} onChange={this.handleNominateChanged}/>
-                  <button onClick={() => this.confirmNominate()}>Đề cử</button>
+                  <button onClick={() => this.onNominate()}>Đề cử</button>
                 </p>
               </div>
               <div className="session">
