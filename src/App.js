@@ -61,9 +61,15 @@ class App extends Component {
   proposals = async (order) => await this.state.contract.proposals(order, {from: this.state.accounts[0]})
   votedCount = async (proposal) => Number(await this.state.contract.votedCount(proposal, {from: this.state.accounts[0]}))
   votesCount = async () => await this.state.contract.votesCount.call({from: this.state.accounts[0]})
-  voteChanged = async (event) => {
-    await this.setState({VOTE: event})
-    info('vote changed', await this.state.VOTE)
+  fetchProposals = async () => {
+    const count = await this.proposalsCount()
+    await this.setState({PROPOSALS_COUNT: count})
+    info('fetchProposals', await this.state.PROPOSALS_COUNT)
+  }
+  fetchVotersCount = async () => {
+    const count = await this.votersCount()
+    await this.setState({VOTERS_COUNT: count})
+    info('fetchVotersCount', await this.state.VOTERS_COUNT)
   }
   confirmVote = () => {
     const option = this.state.VOTE
@@ -72,13 +78,12 @@ class App extends Component {
       // await this.vote(this.state.VOTE)
     }
   }
-  fetchProposals = async () => {
-    const count = await this.proposalsCount()
-    await this.setState({PROPOSALS_COUNT: count})
-    info('fetchProposals', await this.state.PROPOSALS_COUNT)
-  }
-  nominateChanged = event => {
+  handleNominateChanged = event => {
     this.setState({NOMINATE: event.target.value})
+  }
+  handleVoteChanged = async (event) => {
+    await this.setState({VOTE: event})
+    info('vote changed', await this.state.VOTE)
   }
   confirmNominate = async () => {
     const nominate = this.state.NOMINATE
@@ -100,12 +105,6 @@ class App extends Component {
     }
   }
 
-  async fetchVotersCount () {
-    const count = await this.votersCount()
-    await this.setState({VOTERS_COUNT: count})
-    info('fetchVotersCount', await this.state.VOTERS_COUNT)
-  }
-
   render () {
     return (
       <div className='App'>
@@ -114,14 +113,14 @@ class App extends Component {
             <div className="pure-u-1-1 header">
               <div className="session">
                 <p>Đề cử:
-                  <input type="text" value={this.state.NOMINATE} onChange={this.nominateChanged}/>
+                  <input type="text" value={this.state.NOMINATE} onChange={this.handleNominateChanged}/>
                   <button onClick={() => this.confirmNominate()}>Đề cử</button>
                 </p>
               </div>
               <div className="session">
                 <p>Hiện có {this.state.PROPOSALS_COUNT} đề cử <button onClick={() => this.fetchProposals()}>Cập
                   nhật</button></p>
-                <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.voteChanged}>
+                <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.handleVoteChanged}>
                   <label><Radio value="0"/>Apple</label>
                   <label><Radio value="1"/>Orange</label>
                   <label><Radio value="2"/>Watermelon</label>
