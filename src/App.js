@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import web3 from 'web3'
 import getWeb3 from './utils/getWeb3'
 import { Radio, RadioGroup } from 'react-radio-group'
 import Ballot from './contracts/Ballot.json'
@@ -22,7 +23,6 @@ let nominate = null
 let register = null
 let vote = null
 let votedCount = null
-
 
 class App extends Component {
 
@@ -73,11 +73,17 @@ class App extends Component {
   }
   proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: this.state.accounts[0]}))
   votersCount = async () => Number(await this.state.contract.votersCount.call({from: this.state.accounts[0]}))
-  proposals = async (order) => await this.state.contract.proposals(order, {from: this.state.accounts[0]})
+  proposals = async (order) => await this.state.contract.proposals.call(order, {from: this.state.accounts[0]})
   votesCount = async () => await this.state.contract.votesCount.call({from: this.state.accounts[0]})
   fetchProposals = async () => {
     const count = await this.proposalsCount()
     await this.setState({PROPOSALS_COUNT: count})
+    let proposals = []
+    for (let i = 0; i < count; i++) {
+      let hex = await this.proposals(i)
+      proposals.push(web3.utils.toUtf8(hex))
+    }
+    this.setState({PROPOSALS: proposals})
     info('fetchProposals', await this.state.PROPOSALS_COUNT)
   }
   fetchVotersCount = async () => {
@@ -113,6 +119,7 @@ class App extends Component {
     super(props)
     this.state = {
       PROPOSALS_COUNT: 0,
+      PROPOSALS: [],
       VOTERS_COUNT: 0,
       NOMINATE: '',
       VOTE: 0,
@@ -135,9 +142,9 @@ class App extends Component {
                 <p>Hiện có {this.state.PROPOSALS_COUNT} đề cử <button onClick={() => this.fetchProposals()}>Cập
                   nhật</button></p>
                 <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.handleVoteChanged}>
-                  <label><Radio value="0"/>Apple</label>
-                  <label><Radio value="1"/>Orange</label>
-                  <label><Radio value="2"/>Watermelon</label>
+                  {this.state.PROPOSALS.map((proposal, i) => {
+                    return <label key={i}><Radio value={i}/>{proposal}</label>
+                  })}
                 </RadioGroup>
                 <button onClick={() => this.confirmVote()}>Bầu</button>
                 <br/><br/>
