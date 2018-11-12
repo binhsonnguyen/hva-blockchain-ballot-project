@@ -14,6 +14,11 @@ const A_PROPOSAL = 'WINNER' // 0x57494e4e4552
 const ANOTHER_PROPOSAL = 'LOOSER' // 0x4c4f4f534552
 const WINNER = 0 // 0x4c4f4f534552
 const LOOSER = 1 // 0x4c4f4f534552
+const StateValues = {
+  PREPARING: 0,
+  VOTING: 1,
+  FINISHED: 2,
+}
 
 contract('ballot, given when preparing, it...', accounts => {
   const CHAIR = accounts[0]
@@ -34,6 +39,11 @@ contract('ballot, given when preparing, it...', accounts => {
     start = Start(contract)
     vote = Vote(contract)
     finishes = Finish(contract)
+  })
+
+  it('...should let people know current state', async () => {
+    let state = Number(await contract.getState.call())
+    assert.strictEqual(state, StateValues.PREPARING)
   })
 
   it('...should reject others registering', async () => {
@@ -160,6 +170,11 @@ contract('ballot, given when started, it...', accounts => {
     await start().by(CHAIR)
   })
 
+  it('...should let people know current state', async () => {
+    let state = Number(await contract.getState.call())
+    assert.strictEqual(state, StateValues.VOTING)
+  })
+
   it('...should reject chairman do register', async () => {
     await attempt(async () => {
       await register(A_VOTER).by(CHAIR)
@@ -244,6 +259,22 @@ contract('ballot, given when finished, it...', accounts => {
     await register(A_VOTER).by(CHAIR)
     await register(AN_OTHER_VOTER).by(CHAIR)
     await start().by(CHAIR)
+  })
+
+  it('...should let chairman finishes ballot', async () => {
+    await attempt(async () => {
+      await vote(WINNER).by(A_VOTER)
+      await vote(WINNER).by(AN_OTHER_VOTER)
+      await finishes().by(CHAIR)
+    }).should.be.succeed()
+  })
+
+  it('...should let people know current state', async () => {
+    await vote(WINNER).by(A_VOTER)
+    await vote(WINNER).by(AN_OTHER_VOTER)
+    await finishes().by(CHAIR)
+    let state = Number(await contract.getState.call())
+    assert.strictEqual(state, StateValues.FINISHED)
   })
 
   it('...should let people get voted count of a specified proposal', async () => {

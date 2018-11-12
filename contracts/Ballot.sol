@@ -25,6 +25,15 @@ contract Stageable {
     _;
   }
 
+  function getState() public view returns (uint8) {
+    if (_stage == Stage.Preparing) {
+      return 0;
+    } else if (_stage == Stage.Voting) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
 }
 
 

@@ -24,6 +24,12 @@ let register = null
 let vote = null
 let votedCount = null
 
+const State = {
+  PREPARING: Symbol("PREPARING"),
+  VOTING: Symbol("VOTING"),
+  FINISHED: Symbol("FINISHED")
+}
+
 class App extends Component {
 
   componentDidMount = async () => {
@@ -121,7 +127,7 @@ class App extends Component {
   }
   onVote = async () => {
     const option = this.state.VOTE
-    if (window.confirm(`Bạn xác nhận bầu cho "${option}"?`)) {
+    if (window.confirm(`Bạn xác nhận bầu cho "${this.state.PROPOSALS[option]}"?`)) {
       info('vote', `confirmed ${option}`)
       await vote(this.state.VOTE).by(sender)
     }
@@ -136,6 +142,7 @@ class App extends Component {
       NOMINATE: '',
       REGISTER: '',
       VOTE: 0,
+      STATE: State.PREPARING,
     }
   }
 
@@ -145,6 +152,13 @@ class App extends Component {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1 header">
+              <div id='stages' className="session">
+                <p>Trạng thái:
+                  <button disabled={true}>Chuẩn bị</button>
+                  <button onClick={() => this.onStart()} disabled={true}>Bắt đầu</button>
+                  <button onClick={() => this.onFinish()} disabled={true}>Kết thúc</button>
+                </p>
+              </div>
               <div id='nominate' className="session">
                 <p>Đề cử:
                   <input type="text" value={this.state.NOMINATE} onChange={this.handleNominateChanged}/>
