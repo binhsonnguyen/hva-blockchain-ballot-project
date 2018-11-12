@@ -106,6 +106,7 @@ class App extends Component {
   fetchState = async () => {
     let stateValue = Number(await this.state.contract.getState.call())
     this.setState({STATE: State.valueOf(stateValue)})
+    info('fetchState', this.state.STATE)
   }
   fetchVotersCount = async () => {
     const count = await this.votersCount()
