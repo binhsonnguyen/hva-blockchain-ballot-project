@@ -16,7 +16,7 @@ import './App.css'
 let info = (owner, msg) => console.info(owner, msg)
 let err = (owner, msg) => console.error(owner, msg)
 
-let chair = null
+let sender = null
 let start = null
 let finish = null
 let nominate = null
@@ -54,7 +54,7 @@ class App extends Component {
       }
       await this.setState(state)
       info(responsible, 'app\'s state loaded with contract and accounts infomation')
-      chair = this.state.accounts[0]
+      sender = this.state.accounts[0]
       start = Start(this.state.contract)
       finish = Finish(this.state.contract)
       nominate = Nominate(this.state.contract)
@@ -71,10 +71,10 @@ class App extends Component {
       err('componentDidMount', error)
     }
   }
-  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: chair}))
-  votersCount = async () => Number(await this.state.contract.votersCount.call({from: chair}))
-  proposals = async (order) => await this.state.contract.proposals.call(order, {from: chair})
-  votesCount = async () => await this.state.contract.votesCount.call({from: chair})
+  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: sender}))
+  votersCount = async () => Number(await this.state.contract.votersCount.call({from: sender}))
+  proposals = async (order) => await this.state.contract.proposals.call(order, {from: sender})
+  votesCount = async () => await this.state.contract.votesCount.call({from: sender})
   fetchProposals = async () => {
     const count = await this.proposalsCount()
     await this.setState({PROPOSALS_COUNT: count})
@@ -94,6 +94,9 @@ class App extends Component {
   handleNominateChanged = event => {
     this.setState({NOMINATE: event.target.value})
   }
+  handleRegisterChanged = event => {
+    this.setState({REGISTER: event.target.value})
+  }
   handleVoteChanged = async (event) => {
     await this.setState({VOTE: event})
     info('vote changed', await this.state.VOTE)
@@ -102,16 +105,25 @@ class App extends Component {
     const proposal = this.state.NOMINATE
     if (window.confirm(`Xác nhận đề cử "${proposal}"?`)) {
       info('nominate', `confirmed ${proposal}`)
-      await nominate(proposal).by(chair)
+      await nominate(proposal).by(sender)
       info('nominate', `success ${proposal}`)
       this.setState({NOMINATE: ''})
+    }
+  }
+  onRegister = async () => {
+    const voter = this.state.REGISTER
+    if (window.confirm(`Xác nhận đề cử "${voter}"?`)) {
+      info('nominate', `confirmed ${voter}`)
+      await register(voter).by(sender)
+      info('nominate', `success ${voter}`)
+      this.setState({REGISTER: ''})
     }
   }
   onVote = async () => {
     const option = this.state.VOTE
     if (window.confirm(`Bạn xác nhận bầu cho "${option}"?`)) {
       info('vote', `confirmed ${option}`)
-      await vote(this.state.VOTE).by(chair)
+      await vote(this.state.VOTE).by(sender)
     }
   }
 
@@ -122,6 +134,7 @@ class App extends Component {
       PROPOSALS: [],
       VOTERS_COUNT: 0,
       NOMINATE: '',
+      REGISTER: '',
       VOTE: 0,
     }
   }
@@ -132,10 +145,16 @@ class App extends Component {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1 header">
-              <div className="session">
+              <div id='nominate' className="session">
                 <p>Đề cử:
                   <input type="text" value={this.state.NOMINATE} onChange={this.handleNominateChanged}/>
                   <button onClick={() => this.onNominate()}>Đề cử</button>
+                </p>
+              </div>
+              <div id='register' className="session">
+                <p>Đăng ký:
+                  <input type="text" value={this.state.REGISTER} onChange={this.handleRegisterChanged}/>
+                  <button onClick={() => this.onRegister()}>Đăng ký</button>
                 </p>
               </div>
               <div className="session">
