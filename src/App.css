@@ -33,6 +33,7 @@
 
 div.session {
   border: 1px solid #EEE;
+  margin: 10px auto;
   padding: 5px 20px;
   text-align: left;
 }
