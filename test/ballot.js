@@ -24,6 +24,7 @@ contract('ballot, given when preparing, it...', accounts => {
   let nominate = null
   let register = null
   let start = null
+  let vote = null
   let finishes = null
 
   beforeEach(async () => {
@@ -31,6 +32,7 @@ contract('ballot, given when preparing, it...', accounts => {
     nominate = Nominate(contract)
     register = Register(contract)
     start = Start(contract)
+    vote = Vote(contract)
     finishes = Finish(contract)
   })
 

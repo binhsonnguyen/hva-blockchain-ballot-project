@@ -140,7 +140,7 @@ contract Ballot is Nominateable, Registrable {
     emit Finished();
   }
 
-  function vote(uint order) public registered(msg.sender) neverVoted(msg.sender) {
+  function vote(uint order) public inVoteTime registered(msg.sender) neverVoted(msg.sender) {
     _voters[msg.sender].voted = true;
     _nominated[proposals[order]].vote += _isChairman(msg.sender) ? 2 : 1;
     votesCount++;
