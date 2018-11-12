@@ -91,13 +91,6 @@ class App extends Component {
     await this.setState({VOTERS_COUNT: count})
     info('fetchVotersCount', await this.state.VOTERS_COUNT)
   }
-  confirmVote = () => {
-    const option = this.state.VOTE
-    if (window.confirm(`Bạn xác nhận bầu cho "${option}"?`)) {
-      info('vote', `confirmed ${option}`)
-      // await this.vote(this.state.VOTE)
-    }
-  }
   handleNominateChanged = event => {
     this.setState({NOMINATE: event.target.value})
   }
@@ -112,6 +105,13 @@ class App extends Component {
       await nominate(proposal).by(chair)
       info('nominate', `success ${proposal}`)
       this.setState({NOMINATE: ''})
+    }
+  }
+  onVote = async () => {
+    const option = this.state.VOTE
+    if (window.confirm(`Bạn xác nhận bầu cho "${option}"?`)) {
+      info('vote', `confirmed ${option}`)
+      await vote(this.state.VOTE).by(chair)
     }
   }
 
@@ -146,7 +146,7 @@ class App extends Component {
                     return <label key={i}><Radio value={i}/>{proposal}<br/></label>
                   })}
                 </RadioGroup>
-                <button onClick={() => this.confirmVote()}>Bầu</button>
+                <button onClick={() => this.onVote()}>Bầu</button>
                 <br/><br/>
               </div>
               <h3>Người bỏ phiếu đã đăng ký: {this.state.VOTERS_COUNT}</h3>
