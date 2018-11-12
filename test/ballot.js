@@ -92,6 +92,14 @@ contract('ballot, given when preparing, it...', accounts => {
     }).should.be.rejected()
   })
 
+  it('...should reject registered voter do vote too soon', async () => {
+    await attempt(async () => {
+      await nominate(A_PROPOSAL).by(CHAIR)
+      await register(A_VOTER).by(CHAIR)
+      await vote(WINNER).by(A_VOTER)
+    }).should.be.rejected()
+  })
+
   it('...should let chairman start ballot pharse', async () => {
     await attempt(async () => {
       await nominate(A_PROPOSAL).by(CHAIR)
