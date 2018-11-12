@@ -71,10 +71,10 @@ class App extends Component {
       err('componentDidMount', error)
     }
   }
-  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: this.state.accounts[0]}))
-  votersCount = async () => Number(await this.state.contract.votersCount.call({from: this.state.accounts[0]}))
-  proposals = async (order) => await this.state.contract.proposals.call(order, {from: this.state.accounts[0]})
-  votesCount = async () => await this.state.contract.votesCount.call({from: this.state.accounts[0]})
+  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: chair}))
+  votersCount = async () => Number(await this.state.contract.votersCount.call({from: chair}))
+  proposals = async (order) => await this.state.contract.proposals.call(order, {from: chair})
+  votesCount = async () => await this.state.contract.votesCount.call({from: chair})
   fetchProposals = async () => {
     const count = await this.proposalsCount()
     await this.setState({PROPOSALS_COUNT: count})
@@ -143,7 +143,7 @@ class App extends Component {
                   nhật</button></p>
                 <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.handleVoteChanged}>
                   {this.state.PROPOSALS.map((proposal, i) => {
-                    return <label key={i}><Radio value={i}/>{proposal}</label>
+                    return <label key={i}><Radio value={i}/>{proposal}<br/></label>
                   })}
                 </RadioGroup>
                 <button onClick={() => this.confirmVote()}>Bầu</button>
