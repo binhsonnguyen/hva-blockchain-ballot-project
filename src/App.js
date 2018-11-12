@@ -24,18 +24,18 @@ let register = null
 let vote = null
 let votedCount = null
 
-const State = {
-  PREPARING: Symbol("PREPARING"),
-  VOTING: Symbol("VOTING"),
-  FINISHED: Symbol("FINISHED"),
+const Stage = {
+  PREPARING: Symbol('PREPARING'),
+  VOTING: Symbol('VOTING'),
+  FINISHED: Symbol('FINISHED'),
   valueOf: value => {
     switch (value) {
       case 0:
-        return State.PREPARING
+        return Stage.PREPARING
       case 1:
-        return State.VOTING
+        return Stage.VOTING
       default:
-        return State.FINISHED
+        return Stage.FINISHED
     }
   }
 }
@@ -105,8 +105,8 @@ class App extends Component {
   }
   fetchState = async () => {
     let stateValue = Number(await this.state.contract.getState.call())
-    this.setState({STATE: State.valueOf(stateValue)})
-    info('fetchState', this.state.STATE)
+    this.setState({STAGE: Stage.valueOf(stateValue)})
+    info('fetchState', this.state.STAGE)
   }
   fetchVotersCount = async () => {
     const count = await this.votersCount()
@@ -141,6 +141,14 @@ class App extends Component {
       this.setState({REGISTER: ''})
     }
   }
+  onStart = async () => {
+    info('on start')
+    this.fetchState()
+  }
+  onFinish = async () => {
+    info('on start')
+    this.fetchState()
+  }
   onVote = async () => {
     const option = this.state.VOTE
     if (window.confirm(`Bạn xác nhận bầu cho "${this.state.PROPOSALS[option]}"?`)) {
@@ -158,23 +166,32 @@ class App extends Component {
       NOMINATE: '',
       REGISTER: '',
       VOTE: 0,
-      STATE: '',
+      STAGE: '',
     }
   }
 
   render () {
+    let stageTitle, stageButton
+    if (this.state.STAGE === Stage.PREPARING) {
+      stageTitle = 'Đang chuẩn bị'
+      stageButton = <button onClick={() => this.onStart()}>Bắt đầu</button>
+    } else if (this.state.STAGE === Stage.VOTING) {
+      stageTitle = 'Đang bỏ phiếu'
+      stageButton = <button onClick={() => this.onFinish()} disabled={true}>Kết thúc</button>
+    } else {
+      stageTitle = 'Đã kết thúc'
+    }
+
     return (
       <div className='App'>
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1 header">
               <div id='stages' className="session">
-                <p>Trạng thái:
-                  <button disabled={true}>Chuẩn bị</button>
-                  <button onClick={() => this.onStart()} disabled={true}>Bắt đầu</button>
-                  <button onClick={() => this.onFinish()} disabled={true}>Kết thúc</button>
-                  <button onClick={() => this.fetchState()}>Cập nhật</button>
+                <p>Trạng thái: {stageTitle}
+                  {stageButton}
                 </p>
+                <button onClick={() => this.fetchState()}>Cập nhật</button>
               </div>
               <div id='nominate' className="session">
                 <p>Đề cử:
