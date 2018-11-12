@@ -103,6 +103,9 @@ class App extends Component {
     this.setState({PROPOSALS: proposals})
     info('fetchProposals', await this.state.PROPOSALS_COUNT)
   }
+  fetchResults = async () => {
+    info('fetchResults')
+  }
   fetchStage = async () => {
     let stateValue = Number(await this.state.contract.getState.call())
     this.setState({STAGE: Stage.valueOf(stateValue)})
@@ -142,15 +145,20 @@ class App extends Component {
     }
   }
   onStart = async () => {
-    info('on start')
     if (window.confirm(`Xác nhận bắt đầu bầu cử?`)) {
       await start().by(await this.sender())
+      info('onStart', 'succeed, fetching stage')
       await this.fetchStage()
       window.alert(`Bầu cử đã bắt đầu`)
     }
   }
   onFinish = async () => {
-    info('on start')
+    if (window.confirm(`Xác nhận kết thúc bầu cử?`)) {
+      await finish().by(await this.sender())
+      info('onFinish', 'succeed, fetching stage')
+      await this.fetchStage()
+      window.alert(`Bầu cử đã kết thúc`)
+    }
   }
   onVote = async () => {
     const option = this.state.VOTE
@@ -192,10 +200,13 @@ class App extends Component {
           <div className="pure-g">
             <div className="pure-u-1-1 header">
               <div id='stages' className="session">
-                <p>Trạng thái: {stageTitle}
-                  {stageButton}
-                </p>
-                <button onClick={() => this.fetchStage()}>Cập nhật</button>
+                Trạng thái: {stageTitle} {stageButton}
+                <button onClick={() => this.fetchStage()}
+                        disabled={this.state.STAGE === Stage.FINISHED}>Cập nhật
+                </button>
+                <button onClick={() => this.fetchResults()}
+                        disabled={this.state.STAGE !== Stage.FINISHED}>Hiện kết quả
+                </button>
               </div>
               <div id='nominate' className="session">
                 <p>Đề cử:
