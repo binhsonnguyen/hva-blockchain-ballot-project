@@ -27,7 +27,17 @@ let votedCount = null
 const State = {
   PREPARING: Symbol("PREPARING"),
   VOTING: Symbol("VOTING"),
-  FINISHED: Symbol("FINISHED")
+  FINISHED: Symbol("FINISHED"),
+  valueOf: value => {
+    switch (value) {
+      case 0:
+        return State.PREPARING
+      case 1:
+        return State.VOTING
+      default:
+        return State.FINISHED
+    }
+  }
 }
 
 class App extends Component {
@@ -70,6 +80,7 @@ class App extends Component {
 
       await this.fetchProposals()
       await this.fetchVotersCount()
+      await this.fetchState()
     } catch (error) {
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`
@@ -91,6 +102,10 @@ class App extends Component {
     }
     this.setState({PROPOSALS: proposals})
     info('fetchProposals', await this.state.PROPOSALS_COUNT)
+  }
+  fetchState = async () => {
+    let stateValue = Number(await this.state.contract.getState.call())
+    this.setState({STATE: State.valueOf(stateValue)})
   }
   fetchVotersCount = async () => {
     const count = await this.votersCount()
@@ -142,7 +157,7 @@ class App extends Component {
       NOMINATE: '',
       REGISTER: '',
       VOTE: 0,
-      STATE: State.PREPARING,
+      STATE: '',
     }
   }
 
@@ -157,6 +172,7 @@ class App extends Component {
                   <button disabled={true}>Chuẩn bị</button>
                   <button onClick={() => this.onStart()} disabled={true}>Bắt đầu</button>
                   <button onClick={() => this.onFinish()} disabled={true}>Kết thúc</button>
+                  <button onClick={() => this.fetchState()}>Cập nhật</button>
                 </p>
               </div>
               <div id='nominate' className="session">
