@@ -16,7 +16,6 @@ import './App.css'
 let info = (owner, msg) => console.info(owner, msg)
 let err = (owner, msg) => console.error(owner, msg)
 
-let sender = null
 let start = null
 let finish = null
 let nominate = null
@@ -70,7 +69,6 @@ class App extends Component {
       }
       await this.setState(state)
       info(responsible, 'app\'s state loaded with contract and accounts infomation')
-      sender = this.state.accounts[0]
       start = Start(this.state.contract)
       finish = Finish(this.state.contract)
       nominate = Nominate(this.state.contract)
@@ -88,10 +86,12 @@ class App extends Component {
       err('componentDidMount', error)
     }
   }
-  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: sender}))
-  votersCount = async () => Number(await this.state.contract.votersCount.call({from: sender}))
-  proposals = async (order) => await this.state.contract.proposals.call(order, {from: sender})
-  votesCount = async () => await this.state.contract.votesCount.call({from: sender})
+  getAccounts = async () => await this.state.web3.eth.getAccounts()
+  sender = async () => (await this.getAccounts())[0]
+  proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: await this.sender()}))
+  votersCount = async () => Number(await this.state.contract.votersCount.call({from: await this.sender()}))
+  proposals = async (order) => await this.state.contract.proposals.call(order, {from: await this.sender()})
+  votesCount = async () => await this.state.contract.votesCount.call({from: await this.sender()})
   fetchProposals = async () => {
     const count = await this.proposalsCount()
     await this.setState({PROPOSALS_COUNT: count})
@@ -127,7 +127,7 @@ class App extends Component {
     const proposal = this.state.NOMINATE
     if (window.confirm(`Xác nhận đề cử "${proposal}"?`)) {
       info('nominate', `confirmed ${proposal}`)
-      await nominate(proposal).by(sender)
+      await nominate(proposal).by(await this.sender())
       info('nominate', `success ${proposal}`)
       this.setState({NOMINATE: ''})
     }
@@ -136,7 +136,7 @@ class App extends Component {
     const voter = this.state.REGISTER
     if (window.confirm(`Xác nhận đề cử "${voter}"?`)) {
       info('nominate', `confirmed ${voter}`)
-      await register(voter).by(sender)
+      await register(voter).by(await this.sender())
       info('nominate', `success ${voter}`)
       this.setState({REGISTER: ''})
     }
@@ -144,7 +144,7 @@ class App extends Component {
   onStart = async () => {
     info('on start')
     if (window.confirm(`Xác nhận bắt đầu bầu cử?`)) {
-      await start().by(sender)
+      await start().by(await this.sender())
       await this.fetchStage()
       window.alert(`Bầu cử đã bắt đầu`)
     }
@@ -155,7 +155,8 @@ class App extends Component {
   onVote = async () => {
     const option = this.state.VOTE
     if (window.confirm(`Bạn xác nhận bầu cho "${this.state.PROPOSALS[option]}"?`)) {
-      info('vote', `confirmed ${option}`)
+      let sender = await this.sender()
+      info('onVote', `confirmed vote ${option} by ${sender}`)
       await vote(this.state.VOTE).by(sender)
     }
   }
