@@ -80,7 +80,7 @@ class App extends Component {
 
       await this.fetchProposals()
       await this.fetchVotersCount()
-      await this.fetchState()
+      await this.fetchStage()
     } catch (error) {
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`
@@ -103,10 +103,10 @@ class App extends Component {
     this.setState({PROPOSALS: proposals})
     info('fetchProposals', await this.state.PROPOSALS_COUNT)
   }
-  fetchState = async () => {
+  fetchStage = async () => {
     let stateValue = Number(await this.state.contract.getState.call())
     this.setState({STAGE: Stage.valueOf(stateValue)})
-    info('fetchState', this.state.STAGE)
+    info('fetchStage', this.state.STAGE)
   }
   fetchVotersCount = async () => {
     const count = await this.votersCount()
@@ -143,11 +143,14 @@ class App extends Component {
   }
   onStart = async () => {
     info('on start')
-    this.fetchState()
+    if (window.confirm(`Xác nhận bắt đầu bầu cử?`)) {
+      await start().by(sender)
+      await this.fetchStage()
+      window.alert(`Bầu cử đã bắt đầu`)
+    }
   }
   onFinish = async () => {
     info('on start')
-    this.fetchState()
   }
   onVote = async () => {
     const option = this.state.VOTE
@@ -177,7 +180,7 @@ class App extends Component {
       stageButton = <button onClick={() => this.onStart()}>Bắt đầu</button>
     } else if (this.state.STAGE === Stage.VOTING) {
       stageTitle = 'Đang bỏ phiếu'
-      stageButton = <button onClick={() => this.onFinish()} disabled={true}>Kết thúc</button>
+      stageButton = <button onClick={() => this.onFinish()}>Kết thúc</button>
     } else {
       stageTitle = 'Đã kết thúc'
     }
@@ -191,7 +194,7 @@ class App extends Component {
                 <p>Trạng thái: {stageTitle}
                   {stageButton}
                 </p>
-                <button onClick={() => this.fetchState()}>Cập nhật</button>
+                <button onClick={() => this.fetchStage()}>Cập nhật</button>
               </div>
               <div id='nominate' className="session">
                 <p>Đề cử:
