@@ -25,11 +25,12 @@
     "extends": "react-app"
   },
   "scripts": {
+    "compile": "truffle compile",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "link-contracts": "cd src && rm contracts; ln -s ../build/contracts ./contracts",
+    "link-contracts": "cd src && unlink contracts; ln -s ../build/contracts ./contracts",
     "link-libs": "cd libs; for f in *; do ln -s $PWD/$f ../src/utils/; done"
   },
   "repository": {

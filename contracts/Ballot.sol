@@ -36,7 +36,7 @@ contract OwnedByChairman {
     _;
   }
 
-  function _isChairman(address people) internal returns (bool) {
+  function _isChairman(address people) internal view returns (bool) {
     return _chairman == people;
   }
 }
