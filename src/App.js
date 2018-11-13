@@ -88,13 +88,14 @@ class App extends Component {
   sender = async () => (await this.getAccounts())[0]
   proposalsCount = async () => Number(await this.state.contract.proposalsCount.call({from: await this.sender()}))
   votersCount = async () => Number(await this.state.contract.votersCount.call({from: await this.sender()}))
+  votesCount = async () => Number(await this.state.contract.votesCount.call({from: await this.sender()}))
   proposals = async (order) => await this.state.contract.proposals.call(order, {from: await this.sender()})
-  votesCount = async () => await this.state.contract.votesCount.call({from: await this.sender()})
   fetchAll = async () => {
     await this.fetchProposals()
     await this.fetchResults()
     await this.fetchStage()
     await this.fetchVotersCount()
+    await this.fetchVotesCount()
   }
   fetchProposals = async () => {
     const count = await this.proposalsCount()
@@ -123,7 +124,7 @@ class App extends Component {
   fetchVotesCount = async () => {
     const count = await this.votesCount()
     await this.setState({VOTES_COUNT: count})
-    info('fetchVotesCount', await this.state.VOTES_COUNT)
+    info('fetchVotesCount', this.state.VOTES_COUNT)
   }
   handleNominateChanged = event => {
     this.setState({NOMINATE: event.target.value})
