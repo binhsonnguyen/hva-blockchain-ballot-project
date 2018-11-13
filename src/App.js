@@ -76,9 +76,7 @@ class App extends Component {
       vote = Vote(this.state.contract)
       votedCount = VotedCount(this.state.contract)
 
-      await this.fetchProposals()
-      await this.fetchVotersCount()
-      await this.fetchStage()
+      await this.fetchAll()
     } catch (error) {
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`
@@ -92,6 +90,12 @@ class App extends Component {
   votersCount = async () => Number(await this.state.contract.votersCount.call({from: await this.sender()}))
   proposals = async (order) => await this.state.contract.proposals.call(order, {from: await this.sender()})
   votesCount = async () => await this.state.contract.votesCount.call({from: await this.sender()})
+  fetchAll = async () => {
+    await this.fetchProposals()
+    await this.fetchResults()
+    await this.fetchStage()
+    await this.fetchVotersCount()
+  }
   fetchProposals = async () => {
     const count = await this.proposalsCount()
     await this.setState({PROPOSALS_COUNT: count})
@@ -206,17 +210,18 @@ class App extends Component {
                 <button onClick={() => this.fetchStage()}
                         disabled={this.state.STAGE === Stage.FINISHED}>Cập nhật
                 </button>
-                <button onClick={() => this.fetchResults()}
-                        disabled={this.state.STAGE !== Stage.FINISHED}>Hiện kết quả
-                </button>
               </div>
               <div id='stats' className="session">
                 <p>Đề cử: <u>{this.state.PROPOSALS_COUNT}</u> đối tượng.
                   <button onClick={() => this.fetchProposals()}>Cập
-                  nhật</button></p>
+                    nhật</button>
+                </p>
                 <p>
                   Đăng ký bỏ phiếu: <u>{this.state.VOTERS_COUNT}</u> đối tượng.
                   <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
+                </p>
+                <p>
+                  <button onClick={() => this.fetchAll()}>Cập nhật tất cả</button>
                 </p>
               </div>
               <div id='nominate' className="session">
