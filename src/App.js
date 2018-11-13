@@ -133,6 +133,7 @@ class App extends Component {
       await nominate(proposal).by(await this.sender())
       info('nominate', `success ${proposal}`)
       this.setState({NOMINATE: ''})
+      await this.fetchProposals()
     }
   }
   onRegister = async () => {
@@ -209,6 +210,15 @@ class App extends Component {
                         disabled={this.state.STAGE !== Stage.FINISHED}>Hiện kết quả
                 </button>
               </div>
+              <div id='stats' className="session">
+                <p>Đề cử: <u>{this.state.PROPOSALS_COUNT}</u> đối tượng.
+                  <button onClick={() => this.fetchProposals()}>Cập
+                  nhật</button></p>
+                <p>
+                  Đăng ký bỏ phiếu: <u>{this.state.VOTERS_COUNT}</u> đối tượng.
+                  <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
+                </p>
+              </div>
               <div id='nominate' className="session">
                 <p>Đề cử:
                   <input type="text" value={this.state.NOMINATE} onChange={this.handleNominateChanged}/>
@@ -220,14 +230,8 @@ class App extends Component {
                   <input type="text" value={this.state.REGISTER} onChange={this.handleRegisterChanged}/>
                   <button onClick={() => this.onRegister()}>Đăng ký</button>
                 </p>
-                <p>
-                  Hiện có {this.state.VOTERS_COUNT} đăng ký.
-                  <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
-                </p>
               </div>
               <div className="session">
-                <p>Hiện có {this.state.PROPOSALS_COUNT} đề cử <button onClick={() => this.fetchProposals()}>Cập
-                  nhật</button></p>
                 <RadioGroup name="proposals" selectedValue={this.state.VOTE} onChange={this.handleVoteChanged}>
                   {this.state.PROPOSALS.map((proposal, i) => {
                     return <label key={i}><Radio value={i}/>{proposal}<br/></label>
