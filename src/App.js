@@ -39,6 +39,13 @@ const Stage = {
   }
 }
 
+class Proposal {
+  constructor (name) {
+    this.name = name
+    this.vote = 0
+  }
+}
+
 class App extends Component {
 
   componentDidMount = async () => {
@@ -102,7 +109,9 @@ class App extends Component {
     let proposals = []
     for (let i = 0; i < count; i++) {
       let hex = await this.proposals(i)
-      proposals.push(web3.utils.toUtf8(hex))
+      let name = web3.utils.toUtf8(hex)
+      let proposal = new Proposal(name)
+      proposals.push(proposal)
     }
     this.setState({PROPOSALS: proposals})
     info('fetchProposals', await this.state.PROPOSALS.length)
@@ -178,7 +187,7 @@ class App extends Component {
   }
   onVote = async () => {
     const option = this.state.VOTE
-    if (window.confirm(`Bạn xác nhận bầu cho "${this.state.PROPOSALS[option]}"?`)) {
+    if (window.confirm(`Bạn xác nhận bầu cho "${this.state.PROPOSALS[option].name}"?`)) {
       let sender = await this.sender()
       info('onVote', `confirmed vote ${option} by ${sender}`)
       await vote(this.state.VOTE).by(sender)
@@ -264,7 +273,7 @@ class App extends Component {
                             selectedValue={this.state.VOTE}
                             onChange={this.handleVoteChanged}>
                   {this.state.PROPOSALS.map((proposal, i) => {
-                    return <label key={i}><Radio value={i}/>{proposal}<br/></label>
+                    return <label key={i}><Radio value={i}/>{proposal.name}<br/></label>
                   })}
                 </RadioGroup>
                 <button onClick={() => this.onVote()}
