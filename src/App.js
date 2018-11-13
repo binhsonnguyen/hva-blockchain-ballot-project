@@ -40,9 +40,19 @@ const Stage = {
 }
 
 class Proposal {
-  constructor (name) {
-    this.name = name
+  constructor () {
+    this.name = ''
     this.vote = 0
+  }
+
+  withName (name) {
+    this.name = name
+    return this
+  }
+
+  withVote (vote) {
+    this.vote = vote
+    return this
   }
 }
 
@@ -110,8 +120,7 @@ class App extends Component {
     for (let i = 0; i < count; i++) {
       let hex = await this.proposals(i)
       let name = web3.utils.toUtf8(hex)
-      let proposal = new Proposal(name)
-      proposals.push(proposal)
+      proposals.push(new Proposal().withName(name))
     }
     this.setState({PROPOSALS: proposals})
     info('fetchProposals', await this.state.PROPOSALS.length)
@@ -122,7 +131,19 @@ class App extends Component {
       return
     }
     info('fetchResults')
-
+    let proposals =
+      this.setState(
+        {
+          PROPOSALS: await Promise.all(
+            this.state.PROPOSALS
+              .map(async proposal => {
+                  let hex = web3.utils.fromUtf8(proposal.name)
+                  let vote = Number(await votedCount().of(hex))
+                  return proposal.withVote(vote)
+                }
+              )
+          )
+        })
   }
   fetchStage = async () => {
     let stateValue = Number(await this.state.contract.getState.call())
@@ -273,7 +294,13 @@ class App extends Component {
                             selectedValue={this.state.VOTE}
                             onChange={this.handleVoteChanged}>
                   {this.state.PROPOSALS.map((proposal, i) => {
-                    return <label key={i}><Radio value={i}/>{proposal.name}<br/></label>
+                    return (
+                      <label key={i}>
+                        <Radio value={i}
+                               disabled={this.state.STAGE !== Stage.VOTING}/>{proposal.name}
+                        <br/>
+                      </label>
+                    )
                   })}
                 </RadioGroup>
                 <button onClick={() => this.onVote()}
