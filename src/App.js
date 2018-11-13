@@ -142,6 +142,7 @@ class App extends Component {
       await register(voter).by(await this.sender())
       info('nominate', `success ${voter}`)
       this.setState({REGISTER: ''})
+      await this.fetchVotersCount()
     }
   }
   onStart = async () => {
@@ -219,6 +220,10 @@ class App extends Component {
                   <input type="text" value={this.state.REGISTER} onChange={this.handleRegisterChanged}/>
                   <button onClick={() => this.onRegister()}>Đăng ký</button>
                 </p>
+                <p>
+                  Hiện có {this.state.VOTERS_COUNT} đăng ký.
+                  <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
+                </p>
               </div>
               <div className="session">
                 <p>Hiện có {this.state.PROPOSALS_COUNT} đề cử <button onClick={() => this.fetchProposals()}>Cập
@@ -231,14 +236,6 @@ class App extends Component {
                 <button onClick={() => this.onVote()}>Bầu</button>
                 <br/><br/>
               </div>
-              <h3>Người bỏ phiếu đã đăng ký: {this.state.VOTERS_COUNT}</h3>
-              <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
-              <br/><br/>
-            </div>
-
-            <div className="pure-u-1-1">
-              <h2>Active Account</h2>
-
               <br/><br/>
             </div>
           </div>
