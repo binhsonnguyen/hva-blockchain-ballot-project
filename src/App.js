@@ -297,7 +297,8 @@ class App extends Component {
                     return (
                       <label key={i}>
                         <Radio value={i}
-                               disabled={this.state.STAGE !== Stage.VOTING}/>{proposal.name}
+                               disabled={this.state.STAGE !== Stage.VOTING}/>
+                        {proposal.name} {proposal.vote > 0 ? `(${proposal.vote} phiếu)` : ''}
                         <br/>
                       </label>
                     )
