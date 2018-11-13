@@ -120,6 +120,11 @@ class App extends Component {
     await this.setState({VOTERS_COUNT: count})
     info('fetchVotersCount', await this.state.VOTERS_COUNT)
   }
+  fetchVotesCount = async () => {
+    const count = await this.votesCount()
+    await this.setState({VOTES_COUNT: count})
+    info('fetchVotesCount', await this.state.VOTES_COUNT)
+  }
   handleNominateChanged = event => {
     this.setState({NOMINATE: event.target.value})
   }
@@ -181,6 +186,7 @@ class App extends Component {
       PROPOSALS_COUNT: 0,
       PROPOSALS: [],
       VOTERS_COUNT: 0,
+      VOTES_COUNT: 0,
       NOMINATE: '',
       REGISTER: '',
       VOTE: 0,
@@ -221,19 +227,23 @@ class App extends Component {
                   <button onClick={() => this.fetchVotersCount()}>Cập nhật</button>
                 </p>
                 <p>
+                  Có <u>{this.state.VOTES_COUNT}</u> đối tượng đã bỏ phiếu.
+                  <button onClick={() => this.fetchVotesCount()}>Cập nhật</button>
+                </p>
+                <p>
                   <button onClick={() => this.fetchAll()}>Cập nhật tất cả</button>
                 </p>
               </div>
               <div id='nominate' className="session">
                 <p>Đề cử:
                   <input type="text" value={this.state.NOMINATE} onChange={this.handleNominateChanged}/>
-                  <button onClick={() => this.onNominate()}>Đề cử</button>
+                  <button onClick={() => this.onNominate()} disabled={this.state.STAGE !== Stage.PREPARING}>Đề cử</button>
                 </p>
               </div>
               <div id='register' className="session">
                 <p>Đăng ký:
                   <input type="text" value={this.state.REGISTER} onChange={this.handleRegisterChanged}/>
-                  <button onClick={() => this.onRegister()}>Đăng ký</button>
+                  <button onClick={() => this.onRegister()} disabled={this.state.STAGE !== Stage.PREPARING}>Đăng ký</button>
                 </p>
               </div>
               <div className="session">
@@ -242,7 +252,7 @@ class App extends Component {
                     return <label key={i}><Radio value={i}/>{proposal}<br/></label>
                   })}
                 </RadioGroup>
-                <button onClick={() => this.onVote()}>Bầu</button>
+                <button onClick={() => this.onVote()} disabled={this.state.STAGE !== Stage.VOTING}>Bầu</button>
                 <br/><br/>
               </div>
               <br/><br/>
