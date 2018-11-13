@@ -99,17 +99,21 @@ class App extends Component {
   }
   fetchProposals = async () => {
     const count = await this.proposalsCount()
-    await this.setState({PROPOSALS_COUNT: count})
     let proposals = []
     for (let i = 0; i < count; i++) {
       let hex = await this.proposals(i)
       proposals.push(web3.utils.toUtf8(hex))
     }
     this.setState({PROPOSALS: proposals})
-    info('fetchProposals', await this.state.PROPOSALS_COUNT)
+    info('fetchProposals', await this.state.PROPOSALS.length)
   }
   fetchResults = async () => {
+    if (this.state.STAGE !== Stage.FINISHED) {
+      info('fetchResults', 'REJECTED')
+      return
+    }
     info('fetchResults')
+
   }
   fetchStage = async () => {
     let stateValue = Number(await this.state.contract.getState.call())
@@ -184,7 +188,6 @@ class App extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      PROPOSALS_COUNT: 0,
       PROPOSALS: [],
       VOTERS_COUNT: 0,
       VOTES_COUNT: 0,
@@ -219,7 +222,7 @@ class App extends Component {
                 </button>
               </div>
               <div id='stats' className="session">
-                <p>Đề cử: <u>{this.state.PROPOSALS_COUNT}</u> đối tượng.
+                <p>Đề cử: <u>{this.state.PROPOSALS.length}</u> đối tượng.
                   <button onClick={() => this.fetchProposals()}>Cập nhật</button>
                 </p>
                 <p>
@@ -266,6 +269,9 @@ class App extends Component {
                 </RadioGroup>
                 <button onClick={() => this.onVote()}
                         disabled={this.state.STAGE !== Stage.VOTING}>Bầu
+                </button>
+                <button onClick={() => this.fetchResults()}
+                        disabled={this.state.STAGE !== Stage.FINISHED}>Hiện kết quả
                 </button>
                 <br/><br/>
               </div>
